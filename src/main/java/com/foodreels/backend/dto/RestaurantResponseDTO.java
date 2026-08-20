@@ -1,76 +1,20 @@
-package com.foodreels.backend.entity;
+package com.foodreels.backend.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "restaurants")
-public class Restaurant {
-    
-    @Id
-    @GeneratedValue
+public class RestaurantResponseDTO {
     private Long id;
-
-    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
-    private String description;
-
-    @Column(nullable = false)
     private String address;
-    
-    @Column(nullable = false)
+    private String description;
     private String phoneNumber;
-    
     private String imageUrl;
-    
     private String websiteUrl;
-    
     private Double latitude;
     private Double longitude;
+    private Double rating;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private double rating;
-
-    @OneToMany(mappedBy = "restaurant")
-    private List<Food> foods; 
-
-    public List<Food> getFoods() {
-        return foods;
-    }
-
-    public void setFoods(List<Food> foods) {
-        this.foods = foods;
-    }
-
-    public Double getRating() {
-        return rating;
-    }
-
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
-    @PrePersist
-    protected void OnCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void OnUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 
     public Long getId() {
         return id;
@@ -84,17 +28,17 @@ public class Restaurant {
     public void setName(String name) {
         this.name = name;
     }
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
     public String getAddress() {
         return address;
     }
     public void setAddress(String address) {
         this.address = address;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
     public String getPhoneNumber() {
         return phoneNumber;
@@ -126,16 +70,16 @@ public class Restaurant {
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
+    public Double getRating() {
+        return rating;
+    }
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

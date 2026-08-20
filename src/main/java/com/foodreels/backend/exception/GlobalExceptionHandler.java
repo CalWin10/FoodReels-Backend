@@ -12,30 +12,44 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 
 public class GlobalExceptionHandler {
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFound(UserNotFoundException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ex.getMessage());
-    }
+        @ExceptionHandler(UserNotFoundException.class)
+        public ResponseEntity<String> handleUserNotFound(UserNotFoundException ex) {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationException(
-            MethodArgumentNotValidException ex) {
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(ex.getMessage());
+        }
 
-        Map<String, String> errors = new HashMap<>();
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<Map<String, String>> handleValidationException(
+                        MethodArgumentNotValidException ex) {
 
-        ex.getBindingResult()
-                .getFieldErrors()
-                .forEach(error -> {
-                    errors.put(
-                            error.getField(),
-                            error.getDefaultMessage());
-                });
+                Map<String, String> errors = new HashMap<>();
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(errors);
-    }
+                ex.getBindingResult()
+                                .getFieldErrors()
+                                .forEach(error -> {
+                                        errors.put(
+                                                        error.getField(),
+                                                        error.getDefaultMessage());
+                                });
+
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(errors);
+        }
+
+        @ExceptionHandler({
+                        RestaurantNotFoundException.class,
+                        FoodNotFoundException.class,
+                        ReelNotFoundException.class
+        })
+        public ResponseEntity<String> handleResourceNotFound(
+                        RuntimeException ex) {
+
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(ex.getMessage());
+        }
 }
