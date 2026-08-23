@@ -11,6 +11,7 @@ import com.foodreels.backend.exception.UserNotFoundException;
 import com.foodreels.backend.mapper.UserMapper;
 import com.foodreels.backend.repository.UserRepository;
 
+
 @Service
 public class UserService {
 
@@ -34,6 +35,8 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         return userMapper.toResponseDTO(savedUser);
+
+        
     }
 
     // Get all users

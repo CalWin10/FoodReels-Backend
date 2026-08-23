@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @RestControllerAdvice
 
@@ -50,6 +52,24 @@ public class GlobalExceptionHandler {
 
                 return ResponseEntity
                                 .status(HttpStatus.NOT_FOUND)
+                                .body(ex.getMessage());
+        }
+
+        @ExceptionHandler(DuplicateEmailException.class)
+        public ResponseEntity<String> handleDuplicateEmail(
+                        DuplicateEmailException ex) {
+
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(ex.getMessage());
+        }
+
+        @ExceptionHandler(InvalidCredentialsException.class)
+        public ResponseEntity<String> handleInvalidCredentials(
+                        InvalidCredentialsException ex) {
+
+                return ResponseEntity
+                                .status(HttpStatus.UNAUTHORIZED)
                                 .body(ex.getMessage());
         }
 }
