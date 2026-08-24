@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import com.foodreels.backend.dto.ViewResponseDTO;
 
 @Service
 public class ReelService {
@@ -160,5 +161,26 @@ public class ReelService {
                         category,
                         pageable)
                 .map(reelMapper::toResponseDTO);
+    }
+
+    public ViewResponseDTO incrementViewCount(Long reelId) {
+
+        Reel reel = reelRepository.findById(reelId)
+                .orElseThrow(() -> new ReelNotFoundException(
+                        "Reel not found with id: " + reelId));
+
+        Long currentViewCount = reel.getViewCount();
+
+        if (currentViewCount == null) {
+            currentViewCount = 0L;
+        }
+
+        reel.setViewCount(currentViewCount + 1);
+
+        Reel updatedReel = reelRepository.save(reel);
+
+        return new ViewResponseDTO(
+                updatedReel.getId(),
+                updatedReel.getViewCount());
     }
 }

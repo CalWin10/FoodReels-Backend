@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.foodreels.backend.dto.ViewResponseDTO;
 
 import com.foodreels.backend.dto.ReelRequestDTO;
 import com.foodreels.backend.dto.ReelResponseDTO;
@@ -127,5 +128,14 @@ public class ReelController {
                                                 category,
                                                 page,
                                                 size));
+        }
+
+        @PostMapping("/{reelId}/view")
+        public ResponseEntity<ViewResponseDTO> incrementViewCount(
+                        @PathVariable Long reelId) {
+
+                ViewResponseDTO response = reelService.incrementViewCount(reelId);
+
+                return ResponseEntity.ok(response);
         }
 }
