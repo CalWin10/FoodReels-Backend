@@ -37,154 +37,206 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 @Configuration
 public class SecurityConfig {
-    @Value("${security.jwt.secret}")
-    private String jwtSecret;
+        @Value("${security.jwt.secret}")
+        private String jwtSecret;
 
-    private SecretKey getSecretKey() {
+        private SecretKey getSecretKey() {
 
-        return new SecretKeySpec(
-                jwtSecret.getBytes(StandardCharsets.UTF_8),
-                "HmacSHA256");
-    }
+                return new SecretKeySpec(
+                                jwtSecret.getBytes(StandardCharsets.UTF_8),
+                                "HmacSHA256");
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public JwtEncoder jwtEncoder() {
+        @Bean
+        public JwtEncoder jwtEncoder() {
 
-        return NimbusJwtEncoder
-                .withSecretKey(getSecretKey())
-                .algorithm(MacAlgorithm.HS256)
-                .build();
-    }
+                return NimbusJwtEncoder
+                                .withSecretKey(getSecretKey())
+                                .algorithm(MacAlgorithm.HS256)
+                                .build();
+        }
 
-    @Bean
-    public JwtDecoder jwtDecoder() {
+        @Bean
+        public JwtDecoder jwtDecoder() {
 
-        return NimbusJwtDecoder
-                .withSecretKey(getSecretKey())
-                .macAlgorithm(MacAlgorithm.HS256)
-                .build();
-    }
+                return NimbusJwtDecoder
+                                .withSecretKey(getSecretKey())
+                                .macAlgorithm(MacAlgorithm.HS256)
+                                .build();
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http)
+                        throws Exception {
 
-        http
-                .csrf(csrf -> csrf.disable())
+                http
+                                .csrf(csrf -> csrf.disable())
 
-                .authorizeHttpRequests(auth -> auth
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                HttpMethod.POST,
+                                                                "/api/reels/*/saves")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
 
-                        .requestMatchers("/api/auth/**")
-                        .permitAll()
+                                                .requestMatchers(
+                                                                HttpMethod.DELETE,
+                                                                "/api/reels/*/saves")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
 
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/restaurants/**",
-                                "/api/foods/**",
-                                "/api/reels/**")
-                        .hasAnyRole(
-                                "USER",
-                                "RESTAURANT_OWNER",
-                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/saves")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.POST,
+                                                                "/api/reels/*/comments")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/restaurants/**",
-                                "/api/foods/**",
-                                "/api/reels/**")
-                        .hasAnyRole(
-                                "RESTAURANT_OWNER",
-                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.DELETE,
+                                                                "/api/comments/*")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers("/api/auth/**")
+                                                .permitAll()
+                                                .requestMatchers(
+                                                                HttpMethod.POST,
+                                                                "/api/reels/*/likes")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
 
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/restaurants/**",
-                                "/api/foods/**",
-                                "/api/reels/**")
-                        .hasAnyRole(
-                                "RESTAURANT_OWNER",
-                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.DELETE,
+                                                                "/api/reels/*/likes")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
 
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/restaurants/**",
-                                "/api/foods/**",
-                                "/api/reels/**")
-                        .hasAnyRole(
-                                "RESTAURANT_OWNER",
-                                "ADMIN")
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/restaurants/**",
+                                                                "/api/foods/**",
+                                                                "/api/reels/**")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
 
-                        .requestMatchers("/api/users/**")
-                        .hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.POST,
+                                                                "/api/restaurants/**",
+                                                                "/api/foods/**",
+                                                                "/api/reels/**")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
 
-                        .anyRequest()
-                        .authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2
+                                                .requestMatchers(HttpMethod.PUT,
+                                                                "/api/restaurants/**",
+                                                                "/api/foods/**",
+                                                                "/api/reels/**")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
 
-                        .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(
-                                        jwtAuthenticationConverter()))
+                                                .requestMatchers(HttpMethod.DELETE,
+                                                                "/api/restaurants/**",
+                                                                "/api/foods/**",
+                                                                "/api/reels/**")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
 
-                        .authenticationEntryPoint(authenticationEntryPoint())
+                                                .requestMatchers("/api/users/**")
+                                                .hasRole("ADMIN")
 
-                        .accessDeniedHandler(accessDeniedHandler()));
+                                                .anyRequest()
+                                                .authenticated())
+                                .oauth2ResourceServer(oauth2 -> oauth2
 
-        return http.build();
-    }
+                                                .jwt(jwt -> jwt
+                                                                .jwtAuthenticationConverter(
+                                                                                jwtAuthenticationConverter()))
 
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+                                                .authenticationEntryPoint(authenticationEntryPoint())
 
-        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+                                                .accessDeniedHandler(accessDeniedHandler()));
 
-        authoritiesConverter.setAuthoritiesClaimName("role");
-        authoritiesConverter.setAuthorityPrefix("ROLE_");
+                return http.build();
+        }
 
-        JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
+        @Bean
+        public JwtAuthenticationConverter jwtAuthenticationConverter() {
 
-        authenticationConverter.setJwtGrantedAuthoritiesConverter(
-                authoritiesConverter);
+                JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
-        return authenticationConverter;
-    }
+                authoritiesConverter.setAuthoritiesClaimName("role");
+                authoritiesConverter.setAuthorityPrefix("ROLE_");
 
-    @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
+                JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
 
-        return (request, response, authException) -> {
+                authenticationConverter.setJwtGrantedAuthoritiesConverter(
+                                authoritiesConverter);
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
+                return authenticationConverter;
+        }
 
-            response.getWriter().write(
-                    """
-                            {
-                                "status": 401,
-                                "error": "Unauthorized",
-                                "message": "Authentication is required"
-                            }
-                            """);
-        };
-    }
+        @Bean
+        public AuthenticationEntryPoint authenticationEntryPoint() {
 
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
+                return (request, response, authException) -> {
 
-        return (request, response, accessDeniedException) -> {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
 
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("application/json");
+                        response.getWriter().write(
+                                        """
+                                                        {
+                                                            "status": 401,
+                                                            "error": "Unauthorized",
+                                                            "message": "Authentication is required"
+                                                        }
+                                                        """);
+                };
+        }
 
-            response.getWriter().write(
-                    """
-                            {
-                                "status": 403,
-                                "error": "Forbidden",
-                                "message": "You do not have permission to access this resource"
-                            }
-                            """);
-        };
-    }
+        @Bean
+        public AccessDeniedHandler accessDeniedHandler() {
+
+                return (request, response, accessDeniedException) -> {
+
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("application/json");
+
+                        response.getWriter().write(
+                                        """
+                                                        {
+                                                            "status": 403,
+                                                            "error": "Forbidden",
+                                                            "message": "You do not have permission to access this resource"
+                                                        }
+                                                        """);
+                };
+        }
 
 }

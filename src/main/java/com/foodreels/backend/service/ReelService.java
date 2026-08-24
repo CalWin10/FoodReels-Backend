@@ -13,6 +13,10 @@ import com.foodreels.backend.exception.ReelNotFoundException;
 import com.foodreels.backend.mapper.ReelMapper;
 import com.foodreels.backend.repository.FoodRepository;
 import com.foodreels.backend.repository.ReelRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class ReelService {
@@ -115,5 +119,46 @@ public class ReelService {
         return foodRepository.findById(id)
                 .orElseThrow(() -> new FoodNotFoundException(
                         "Food not found with id: " + id));
+    }
+
+    public Page<ReelResponseDTO> getReelFeed(
+            int page,
+            int size) {
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(
+                        Sort.Direction.DESC,
+                        "createdAt"));
+
+        Page<Reel> reels = reelRepository.findAll(pageable);
+
+        return reels.map(reelMapper::toResponseDTO);
+    }
+
+    public Page<ReelResponseDTO> discoverReels(
+            String q,
+            Long restaurantId,
+            Long foodId,
+            String category,
+            int page,
+            int size) {
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(
+                        Sort.Direction.DESC,
+                        "createdAt"));
+
+        return reelRepository
+                .discoverReels(
+                        q,
+                        restaurantId,
+                        foodId,
+                        category,
+                        pageable)
+                .map(reelMapper::toResponseDTO);
     }
 }
