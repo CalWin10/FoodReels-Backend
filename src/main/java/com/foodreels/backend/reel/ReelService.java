@@ -1,0 +1,187 @@
+package com.foodreels.backend.reel;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.foodreels.backend.reel.ReelRequestDTO;
+import com.foodreels.backend.reel.ReelResponseDTO;
+import com.foodreels.backend.food.Food;
+import com.foodreels.backend.reel.Reel;
+import com.foodreels.backend.exception.FoodNotFoundException;
+import com.foodreels.backend.exception.ReelNotFoundException;
+import com.foodreels.backend.reel.ReelMapper;
+import com.foodreels.backend.food.FoodRepository;
+import com.foodreels.backend.reel.ReelRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import com.foodreels.backend.reel.ViewResponseDTO;
+
+@Service
+public class ReelService {
+
+    private final ReelRepository reelRepository;
+    private final FoodRepository foodRepository;
+    private final ReelMapper reelMapper;
+
+    public ReelService(
+            ReelRepository reelRepository,
+            FoodRepository foodRepository,
+            ReelMapper reelMapper) {
+
+        this.reelRepository = reelRepository;
+        this.foodRepository = foodRepository;
+        this.reelMapper = reelMapper;
+    }
+
+    // Create reel
+    public ReelResponseDTO createReel(ReelRequestDTO requestDTO) {
+
+        Reel reel = reelMapper.toEntity(requestDTO);
+
+        Food food = findFoodById(requestDTO.getFoodId());
+
+        reel.setFood(food);
+
+        Reel savedReel = reelRepository.save(reel);
+
+        return reelMapper.toResponseDTO(savedReel);
+    }
+
+    // Get all reels
+    public List<ReelResponseDTO> getAllReels() {
+
+        return reelRepository.findAll()
+                .stream()
+                .map(reelMapper::toResponseDTO)
+                .toList();
+    }
+
+    // Get reel by ID
+    public ReelResponseDTO getReelById(Long id) {
+
+        Reel reel = findReelById(id);
+
+        return reelMapper.toResponseDTO(reel);
+    }
+
+    // Get all reels for a food
+    public List<ReelResponseDTO> getReelsByFoodId(Long foodId) {
+
+        // Ensure the food exists
+        findFoodById(foodId);
+
+        return reelRepository.findByFoodId(foodId)
+                .stream()
+                .map(reelMapper::toResponseDTO)
+                .toList();
+    }
+
+    // Update reel
+    public ReelResponseDTO updateReel(
+            Long id,
+            ReelRequestDTO requestDTO) {
+
+        Reel existingReel = findReelById(id);
+
+        Food food = findFoodById(requestDTO.getFoodId());
+
+        existingReel.setVideoUrl(requestDTO.getVideoUrl());
+        existingReel.setThumbnailUrl(requestDTO.getThumbnailUrl());
+        existingReel.setCaption(requestDTO.getCaption());
+        existingReel.setFood(food);
+
+        Reel updatedReel = reelRepository.save(existingReel);
+
+        return reelMapper.toResponseDTO(updatedReel);
+    }
+
+    // Delete reel
+    public void deleteReel(Long id) {
+
+        Reel reel = findReelById(id);
+
+        reelRepository.delete(reel);
+    }
+
+    // Internal helper
+    private Reel findReelById(Long id) {
+
+        return reelRepository.findById(id)
+                .orElseThrow(() -> new ReelNotFoundException(
+                        "Reel not found with id: " + id));
+    }
+
+    // Internal helper
+    private Food findFoodById(Long id) {
+
+        return foodRepository.findById(id)
+                .orElseThrow(() -> new FoodNotFoundException(
+                        "Food not found with id: " + id));
+    }
+
+    public Page<ReelResponseDTO> getReelFeed(
+            int page,
+            int size) {
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(
+                        Sort.Direction.DESC,
+                        "createdAt"));
+
+        Page<Reel> reels = reelRepository.findAll(pageable);
+
+        return reels.map(reelMapper::toResponseDTO);
+    }
+
+    public Page<ReelResponseDTO> discoverReels(
+            String q,
+            Long restaurantId,
+            Long foodId,
+            String category,
+            int page,
+            int size) {
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(
+                        Sort.Direction.DESC,
+                        "createdAt"));
+
+        return reelRepository
+                .discoverReels(
+                        q,
+                        restaurantId,
+                        foodId,
+                        category,
+                        pageable)
+                .map(reelMapper::toResponseDTO);
+    }
+
+    public ViewResponseDTO incrementViewCount(Long reelId) {
+
+        Reel reel = reelRepository.findById(reelId)
+                .orElseThrow(() -> new ReelNotFoundException(
+                        "Reel not found with id: " + reelId));
+
+        Long currentViewCount = reel.getViewCount();
+
+        if (currentViewCount == null) {
+            currentViewCount = 0L;
+        }
+
+        reel.setViewCount(currentViewCount + 1);
+
+        Reel updatedReel = reelRepository.save(reel);
+
+        return new ViewResponseDTO(
+                updatedReel.getId(),
+                updatedReel.getViewCount());
+    }
+}
+
