@@ -19,6 +19,9 @@ import com.foodreels.backend.dto.ViewResponseDTO;
 import com.foodreels.backend.dto.ReelRequestDTO;
 import com.foodreels.backend.dto.ReelResponseDTO;
 import com.foodreels.backend.service.ReelService;
+import com.foodreels.backend.service.WatchHistoryService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import jakarta.validation.Valid;
 
@@ -27,9 +30,11 @@ import jakarta.validation.Valid;
 public class ReelController {
 
         private final ReelService reelService;
+        private final WatchHistoryService watchHistoryService;
 
-        public ReelController(ReelService reelService) {
+        public ReelController(ReelService reelService, WatchHistoryService watchHistoryService) {
                 this.reelService = reelService;
+                this.watchHistoryService = watchHistoryService;
         }
 
         // Create reel
@@ -132,9 +137,16 @@ public class ReelController {
 
         @PostMapping("/{reelId}/view")
         public ResponseEntity<ViewResponseDTO> incrementViewCount(
-                        @PathVariable Long reelId) {
+                        @PathVariable Long reelId,
+                        @AuthenticationPrincipal Jwt jwt) {
+
+                String email = jwt.getSubject();
 
                 ViewResponseDTO response = reelService.incrementViewCount(reelId);
+
+                watchHistoryService.recordWatch(
+                                reelId,
+                                email);
 
                 return ResponseEntity.ok(response);
         }

@@ -79,6 +79,19 @@ public class SecurityConfig {
 
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
+                                                                "/api/preferences/**")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/watch-history/**")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
                                                                 HttpMethod.POST,
                                                                 "/api/reels/*/view")
                                                 .hasAnyRole(
