@@ -11,130 +11,121 @@ import com.foodreels.backend.entity.UserPreference;
 import com.foodreels.backend.exception.UserNotFoundException;
 import com.foodreels.backend.repository.UserPreferenceRepository;
 import com.foodreels.backend.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 public class UserPreferenceService {
 
-    private final UserPreferenceRepository preferenceRepository;
-    private final UserRepository userRepository;
+        private final UserPreferenceRepository preferenceRepository;
+        private final UserRepository userRepository;
+        private final PersonalizedFeedCacheService cacheService;
 
-    public UserPreferenceService(
-            UserPreferenceRepository preferenceRepository,
-            UserRepository userRepository) {
+        public UserPreferenceService(
+                        UserPreferenceRepository preferenceRepository,
+                        UserRepository userRepository, PersonalizedFeedCacheService cacheService) {
 
-        this.preferenceRepository =
-                preferenceRepository;
+                this.preferenceRepository = preferenceRepository;
 
-        this.userRepository =
-                userRepository;
-    }
+                this.userRepository = userRepository;
 
-    public PreferenceResponseDTO addPreference(
-            String email,
-            PreferenceRequestDTO requestDTO) {
-
-        User user = findUserByEmail(email);
-
-        String category =
-                normalizeCategory(
-                        requestDTO.getCategory()
-                );
-
-        UserPreference preference =
-                preferenceRepository
-                        .findByUser_IdAndCategoryIgnoreCase(
-                                user.getId(),
-                                category
-                        )
-                        .orElse(null);
-
-        if (preference == null) {
-
-            preference =
-                    new UserPreference();
-
-            preference.setUser(user);
-            preference.setCategory(category);
-
-            preference =
-                    preferenceRepository.save(
-                            preference
-                    );
+                this.cacheService = cacheService;
         }
 
-        return toResponseDTO(preference);
-    }
+        @CacheEvict(value = "personalizedFeed", allEntries = true)
+        public PreferenceResponseDTO addPreference(
+                        String email,
+                        PreferenceRequestDTO requestDTO) {
 
-    public List<PreferenceResponseDTO>
-            getMyPreferences(String email) {
+                User user = findUserByEmail(email);
 
-        User user = findUserByEmail(email);
+                String category = normalizeCategory(
+                                requestDTO.getCategory());
 
-        return preferenceRepository
-                .findByUser_IdOrderByCreatedAtAsc(
-                        user.getId()
-                )
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
-    }
+                UserPreference preference = preferenceRepository
+                                .findByUser_IdAndCategoryIgnoreCase(
+                                                user.getId(),
+                                                category)
+                                .orElse(null);
+                cacheService.evictUserPersonalizedFeed(
+                                email);
 
-    public void removePreference(
-            String email,
-            String category) {
+                if (preference == null) {
 
-        User user = findUserByEmail(email);
+                        preference = new UserPreference();
 
-        String normalizedCategory =
-                normalizeCategory(category);
+                        preference.setUser(user);
+                        preference.setCategory(category);
 
-        preferenceRepository
-                .findByUser_IdAndCategoryIgnoreCase(
-                        user.getId(),
-                        normalizedCategory
-                )
-                .ifPresent(
-                        preferenceRepository::delete
-                );
-    }
+                        preference = preferenceRepository.save(
+                                        preference);
+                }
 
-    private User findUserByEmail(
-            String email) {
+                return toResponseDTO(preference);
+        }
 
-        return userRepository
-                .findByEmail(email)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found"
-                        ));
-    }
+        public List<PreferenceResponseDTO> getMyPreferences(String email) {
 
-    private String normalizeCategory(
-            String category) {
+                User user = findUserByEmail(email);
 
-        return category
-                .trim()
-                .toUpperCase();
-    }
+                return preferenceRepository
+                                .findByUser_IdOrderByCreatedAtAsc(
+                                                user.getId())
+                                .stream()
+                                .map(this::toResponseDTO)
+                                .toList();
+        }
 
-    private PreferenceResponseDTO toResponseDTO(
-            UserPreference preference) {
+        @CacheEvict(value = "personalizedFeed", allEntries = true)
+        public void removePreference(
+                        String email,
+                        String category) {
 
-        PreferenceResponseDTO dto =
-                new PreferenceResponseDTO();
+                User user = findUserByEmail(email);
 
-        dto.setId(
-                preference.getId()
-        );
+                String normalizedCategory = normalizeCategory(category);
 
-        dto.setCategory(
-                preference.getCategory()
-        );
+                cacheService.evictUserPersonalizedFeed(
+                                email);
 
-        dto.setCreatedAt(
-                preference.getCreatedAt()
-        );
+                preferenceRepository
+                                .findByUser_IdAndCategoryIgnoreCase(
+                                                user.getId(),
+                                                normalizedCategory)
+                                .ifPresent(
+                                                preferenceRepository::delete);
+        }
 
-        return dto;
-    }
+        private User findUserByEmail(
+                        String email) {
+
+                return userRepository
+                                .findByEmail(email)
+                                .orElseThrow(() -> new UserNotFoundException(
+                                                "User not found"));
+        }
+
+        private String normalizeCategory(
+                        String category) {
+
+                return category
+                                .trim()
+                                .toUpperCase();
+        }
+
+        private PreferenceResponseDTO toResponseDTO(
+                        UserPreference preference) {
+
+                PreferenceResponseDTO dto = new PreferenceResponseDTO();
+
+                dto.setId(
+                                preference.getId());
+
+                dto.setCategory(
+                                preference.getCategory());
+
+                dto.setCreatedAt(
+                                preference.getCreatedAt());
+
+                return dto;
+        }
 }

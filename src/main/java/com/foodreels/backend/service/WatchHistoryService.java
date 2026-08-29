@@ -14,134 +14,121 @@ import com.foodreels.backend.exception.UserNotFoundException;
 import com.foodreels.backend.repository.ReelRepository;
 import com.foodreels.backend.repository.UserRepository;
 import com.foodreels.backend.repository.WatchHistoryRepository;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 public class WatchHistoryService {
 
-    private final WatchHistoryRepository watchHistoryRepository;
-    private final UserRepository userRepository;
-    private final ReelRepository reelRepository;
+        private final WatchHistoryRepository watchHistoryRepository;
+        private final UserRepository userRepository;
+        private final ReelRepository reelRepository;
+        private final PersonalizedFeedCacheService cacheService;
 
-    public WatchHistoryService(
-            WatchHistoryRepository watchHistoryRepository,
-            UserRepository userRepository,
-            ReelRepository reelRepository) {
+        public WatchHistoryService(
+                        WatchHistoryRepository watchHistoryRepository,
+                        UserRepository userRepository,
+                        ReelRepository reelRepository, PersonalizedFeedCacheService cacheService) {
 
-        this.watchHistoryRepository = watchHistoryRepository;
-        this.userRepository = userRepository;
-        this.reelRepository = reelRepository;
-    }
-
-    public void recordWatch(
-            Long reelId,
-            String email) {
-
-        User user = userRepository
-                .findByEmail(email)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found"
-                        ));
-
-        Reel reel = reelRepository
-                .findById(reelId)
-                .orElseThrow(() ->
-                        new ReelNotFoundException(
-                                "Reel not found with id: " + reelId
-                        ));
-
-        WatchHistory history =
-                watchHistoryRepository
-                        .findByUser_IdAndReel_Id(
-                                user.getId(),
-                                reelId
-                        )
-                        .orElse(null);
-
-        LocalDateTime now =
-                LocalDateTime.now();
-
-        if (history == null) {
-
-            history = new WatchHistory();
-
-            history.setUser(user);
-            history.setReel(reel);
-
-            history.setWatchCount(1);
-
-            history.setFirstWatchedAt(now);
-            history.setLastWatchedAt(now);
-
-        } else {
-
-            history.setWatchCount(
-                    history.getWatchCount() + 1
-            );
-
-            history.setLastWatchedAt(now);
+                this.watchHistoryRepository = watchHistoryRepository;
+                this.userRepository = userRepository;
+                this.reelRepository = reelRepository;
+                this.cacheService = cacheService;
         }
 
-        watchHistoryRepository.save(history);
-    }
+        @CacheEvict(value = "personalizedFeed", allEntries = true)
+        public void recordWatch(
+                        Long reelId,
+                        String email) {
 
-    public List<WatchHistoryResponseDTO>
-            getMyWatchHistory(String email) {
+                User user = userRepository
+                                .findByEmail(email)
+                                .orElseThrow(() -> new UserNotFoundException(
+                                                "User not found"));
 
-        User user = userRepository
-                .findByEmail(email)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found"
-                        ));
+                Reel reel = reelRepository
+                                .findById(reelId)
+                                .orElseThrow(() -> new ReelNotFoundException(
+                                                "Reel not found with id: " + reelId));
 
-        return watchHistoryRepository
-                .findByUser_IdOrderByLastWatchedAtDesc(
-                        user.getId()
-                )
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
-    }
+                WatchHistory history = watchHistoryRepository
+                                .findByUser_IdAndReel_Id(
+                                                user.getId(),
+                                                reelId)
+                                .orElse(null);
 
-    private WatchHistoryResponseDTO toResponseDTO(
-            WatchHistory history) {
+                cacheService.evictUserPersonalizedFeed(
+                                email);
 
-        WatchHistoryResponseDTO dto =
-                new WatchHistoryResponseDTO();
+                LocalDateTime now = LocalDateTime.now();
 
-        dto.setReelId(
-                history.getReel().getId()
-        );
+                if (history == null) {
 
-        dto.setCaption(
-                history.getReel().getCaption()
-        );
+                        history = new WatchHistory();
 
-        dto.setFoodId(
-                history.getReel()
-                        .getFood()
-                        .getId()
-        );
+                        history.setUser(user);
+                        history.setReel(reel);
 
-        dto.setFoodName(
-                history.getReel()
-                        .getFood()
-                        .getName()
-        );
+                        history.setWatchCount(1);
 
-        dto.setWatchCount(
-                history.getWatchCount()
-        );
+                        history.setFirstWatchedAt(now);
+                        history.setLastWatchedAt(now);
 
-        dto.setFirstWatchedAt(
-                history.getFirstWatchedAt()
-        );
+                } else {
 
-        dto.setLastWatchedAt(
-                history.getLastWatchedAt()
-        );
+                        history.setWatchCount(
+                                        history.getWatchCount() + 1);
 
-        return dto;
-    }
+                        history.setLastWatchedAt(now);
+                }
+
+                watchHistoryRepository.save(history);
+        }
+
+        public List<WatchHistoryResponseDTO> getMyWatchHistory(String email) {
+
+                User user = userRepository
+                                .findByEmail(email)
+                                .orElseThrow(() -> new UserNotFoundException(
+                                                "User not found"));
+
+                return watchHistoryRepository
+                                .findByUser_IdOrderByLastWatchedAtDesc(
+                                                user.getId())
+                                .stream()
+                                .map(this::toResponseDTO)
+                                .toList();
+        }
+
+        private WatchHistoryResponseDTO toResponseDTO(
+                        WatchHistory history) {
+
+                WatchHistoryResponseDTO dto = new WatchHistoryResponseDTO();
+
+                dto.setReelId(
+                                history.getReel().getId());
+
+                dto.setCaption(
+                                history.getReel().getCaption());
+
+                dto.setFoodId(
+                                history.getReel()
+                                                .getFood()
+                                                .getId());
+
+                dto.setFoodName(
+                                history.getReel()
+                                                .getFood()
+                                                .getName());
+
+                dto.setWatchCount(
+                                history.getWatchCount());
+
+                dto.setFirstWatchedAt(
+                                history.getFirstWatchedAt());
+
+                dto.setLastWatchedAt(
+                                history.getLastWatchedAt());
+
+                return dto;
+        }
 }

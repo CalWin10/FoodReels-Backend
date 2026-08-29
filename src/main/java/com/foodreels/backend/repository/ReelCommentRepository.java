@@ -12,6 +12,7 @@ public interface ReelCommentRepository
     List<ReelComment> findByReel_IdOrderByCreatedAtDesc(
             Long reelId
     );
+    List<ReelComment> findByUser_Id(Long userId);
 
     long countByReel_Id(Long reelId);
 }

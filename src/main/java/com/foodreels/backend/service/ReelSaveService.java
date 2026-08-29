@@ -15,142 +15,132 @@ import com.foodreels.backend.mapper.ReelMapper;
 import com.foodreels.backend.repository.ReelRepository;
 import com.foodreels.backend.repository.ReelSaveRepository;
 import com.foodreels.backend.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 public class ReelSaveService {
 
-    private final ReelSaveRepository reelSaveRepository;
-    private final ReelRepository reelRepository;
-    private final UserRepository userRepository;
-    private final ReelMapper reelMapper;
+        private final ReelSaveRepository reelSaveRepository;
+        private final ReelRepository reelRepository;
+        private final UserRepository userRepository;
+        private final ReelMapper reelMapper;
+        private final PersonalizedFeedCacheService cacheService;
 
-    public ReelSaveService(
-            ReelSaveRepository reelSaveRepository,
-            ReelRepository reelRepository,
-            UserRepository userRepository,
-            ReelMapper reelMapper) {
+        public ReelSaveService(
+                        ReelSaveRepository reelSaveRepository,
+                        ReelRepository reelRepository,
+                        UserRepository userRepository,
+                        ReelMapper reelMapper, PersonalizedFeedCacheService cacheService) {
 
-        this.reelSaveRepository = reelSaveRepository;
-        this.reelRepository = reelRepository;
-        this.userRepository = userRepository;
-        this.reelMapper = reelMapper;
-    }
-
-    public SaveResponseDTO saveReel(
-            Long reelId,
-            String email) {
-
-        User user = findUserByEmail(email);
-        Reel reel = findReelById(reelId);
-
-        boolean alreadySaved =
-                reelSaveRepository.existsByUser_IdAndReel_Id(
-                        user.getId(),
-                        reelId
-                );
-
-        if (!alreadySaved) {
-
-            ReelSave save = new ReelSave();
-
-            save.setUser(user);
-            save.setReel(reel);
-
-            reelSaveRepository.save(save);
+                this.reelSaveRepository = reelSaveRepository;
+                this.reelRepository = reelRepository;
+                this.userRepository = userRepository;
+                this.reelMapper = reelMapper;
+                this.cacheService = cacheService;
         }
 
-        long savedCount =
-                reelSaveRepository.countByUser_Id(
-                        user.getId()
-                );
+        @CacheEvict(value = "personalizedFeed", allEntries = true)
+        public SaveResponseDTO saveReel(
+                        Long reelId,
+                        String email) {
 
-        return new SaveResponseDTO(
-                true,
-                savedCount
-        );
-    }
+                User user = findUserByEmail(email);
+                Reel reel = findReelById(reelId);
 
-    public SaveResponseDTO unsaveReel(
-            Long reelId,
-            String email) {
+                boolean alreadySaved = reelSaveRepository.existsByUser_IdAndReel_Id(
+                                user.getId(),
+                                reelId);
 
-        User user = findUserByEmail(email);
+                if (!alreadySaved) {
 
-        findReelById(reelId);
+                        ReelSave save = new ReelSave();
 
-        reelSaveRepository
-                .findByUser_IdAndReel_Id(
-                        user.getId(),
-                        reelId
-                )
-                .ifPresent(reelSaveRepository::delete);
+                        save.setUser(user);
+                        save.setReel(reel);
 
-        long savedCount =
-                reelSaveRepository.countByUser_Id(
-                        user.getId()
-                );
+                        reelSaveRepository.save(save);
+                }
+                cacheService.evictUserPersonalizedFeed(
+                                email);
 
-        return new SaveResponseDTO(
-                false,
-                savedCount
-        );
-    }
+                long savedCount = reelSaveRepository.countByUser_Id(
+                                user.getId());
 
-    public SaveResponseDTO getSaveStatus(
-            Long reelId,
-            String email) {
+                return new SaveResponseDTO(
+                                true,
+                                savedCount);
+        }
 
-        User user = findUserByEmail(email);
+        @CacheEvict(value = "personalizedFeed", allEntries = true)
+        public SaveResponseDTO unsaveReel(
+                        Long reelId,
+                        String email) {
 
-        findReelById(reelId);
+                User user = findUserByEmail(email);
 
-        boolean saved =
-                reelSaveRepository.existsByUser_IdAndReel_Id(
-                        user.getId(),
-                        reelId
-                );
+                findReelById(reelId);
 
-        long savedCount =
-                reelSaveRepository.countByUser_Id(
-                        user.getId()
-                );
+                reelSaveRepository
+                                .findByUser_IdAndReel_Id(
+                                                user.getId(),
+                                                reelId)
+                                .ifPresent(reelSaveRepository::delete);
 
-        return new SaveResponseDTO(
-                saved,
-                savedCount
-        );
-    }
+                long savedCount = reelSaveRepository.countByUser_Id(
+                                user.getId());
+                cacheService.evictUserPersonalizedFeed(
+                                email);
 
-    public List<ReelResponseDTO> getSavedReels(
-            String email) {
+                return new SaveResponseDTO(
+                                false,
+                                savedCount);
+        }
 
-        User user = findUserByEmail(email);
+        public SaveResponseDTO getSaveStatus(
+                        Long reelId,
+                        String email) {
 
-        return reelSaveRepository
-                .findByUser_IdOrderByCreatedAtDesc(
-                        user.getId()
-                )
-                .stream()
-                .map(ReelSave::getReel)
-                .map(reelMapper::toResponseDTO)
-                .toList();
-    }
+                User user = findUserByEmail(email);
 
-    private User findUserByEmail(String email) {
+                findReelById(reelId);
 
-        return userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found"
-                        ));
-    }
+                boolean saved = reelSaveRepository.existsByUser_IdAndReel_Id(
+                                user.getId(),
+                                reelId);
 
-    private Reel findReelById(Long reelId) {
+                long savedCount = reelSaveRepository.countByUser_Id(
+                                user.getId());
 
-        return reelRepository.findById(reelId)
-                .orElseThrow(() ->
-                        new ReelNotFoundException(
-                                "Reel not found with id: " + reelId
-                        ));
-    }
+                return new SaveResponseDTO(
+                                saved,
+                                savedCount);
+        }
+
+        public List<ReelResponseDTO> getSavedReels(
+                        String email) {
+
+                User user = findUserByEmail(email);
+
+                return reelSaveRepository
+                                .findByUser_IdOrderByCreatedAtDesc(
+                                                user.getId())
+                                .stream()
+                                .map(ReelSave::getReel)
+                                .map(reelMapper::toResponseDTO)
+                                .toList();
+        }
+
+        private User findUserByEmail(String email) {
+
+                return userRepository.findByEmail(email)
+                                .orElseThrow(() -> new UserNotFoundException(
+                                                "User not found"));
+        }
+
+        private Reel findReelById(Long reelId) {
+
+                return reelRepository.findById(reelId)
+                                .orElseThrow(() -> new ReelNotFoundException(
+                                                "Reel not found with id: " + reelId));
+        }
 }

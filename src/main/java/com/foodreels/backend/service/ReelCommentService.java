@@ -15,6 +15,7 @@ import com.foodreels.backend.exception.UserNotFoundException;
 import com.foodreels.backend.repository.ReelCommentRepository;
 import com.foodreels.backend.repository.ReelRepository;
 import com.foodreels.backend.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 public class ReelCommentService {
@@ -33,6 +34,10 @@ public class ReelCommentService {
         this.userRepository = userRepository;
     }
 
+    @CacheEvict(
+        value = "personalizedFeed",
+        allEntries = true
+)
     public CommentResponseDTO createComment(
             Long reelId,
             String email,
@@ -65,6 +70,10 @@ public class ReelCommentService {
                 .toList();
     }
 
+    @CacheEvict(
+        value = "personalizedFeed",
+        allEntries = true
+)
     public void deleteComment(
             Long commentId,
             String email) {

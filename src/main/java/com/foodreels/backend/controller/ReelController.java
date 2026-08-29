@@ -15,13 +15,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.foodreels.backend.dto.ViewResponseDTO;
-
+import com.foodreels.backend.dto.ReelFeedPageDTO;
 import com.foodreels.backend.dto.ReelRequestDTO;
 import com.foodreels.backend.dto.ReelResponseDTO;
+import com.foodreels.backend.service.RecommendationService;
 import com.foodreels.backend.service.ReelService;
 import com.foodreels.backend.service.WatchHistoryService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import com.foodreels.backend.service.RecommendationService;
+import com.foodreels.backend.dto.ReelFeedPageDTO;
 
 import jakarta.validation.Valid;
 
@@ -31,10 +34,18 @@ public class ReelController {
 
         private final ReelService reelService;
         private final WatchHistoryService watchHistoryService;
+        private final RecommendationService recommendationService;
 
-        public ReelController(ReelService reelService, WatchHistoryService watchHistoryService) {
+        public ReelController(
+                        ReelService reelService,
+                        WatchHistoryService watchHistoryService,
+                        RecommendationService recommendationService) {
+
                 this.reelService = reelService;
+
                 this.watchHistoryService = watchHistoryService;
+
+                this.recommendationService = recommendationService;
         }
 
         // Create reel
@@ -100,14 +111,14 @@ public class ReelController {
         }
 
         @GetMapping("/feed")
-        public ResponseEntity<Page<ReelResponseDTO>> getReelFeed(
-
+        public ResponseEntity<ReelFeedPageDTO> getReelFeed(
                         @RequestParam(defaultValue = "0") int page,
-
                         @RequestParam(defaultValue = "10") int size) {
 
                 return ResponseEntity.ok(
-                                reelService.getReelFeed(page, size));
+                                reelService.getReelFeed(
+                                                page,
+                                                size));
         }
 
         @GetMapping("/discover")
@@ -149,5 +160,20 @@ public class ReelController {
                                 email);
 
                 return ResponseEntity.ok(response);
+        }
+
+        @GetMapping("/personalized")
+        public ResponseEntity<ReelFeedPageDTO> getPersonalizedFeed(
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int size,
+                        @AuthenticationPrincipal Jwt jwt) {
+
+                String email = jwt.getSubject();
+
+                return ResponseEntity.ok(
+                                recommendationService.getPersonalizedFeed(
+                                                email,
+                                                page,
+                                                size));
         }
 }

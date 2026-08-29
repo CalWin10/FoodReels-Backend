@@ -18,6 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import com.foodreels.backend.dto.ViewResponseDTO;
+import org.springframework.cache.annotation.Cacheable;
+import com.foodreels.backend.dto.ReelFeedPageDTO;
+import org.springframework.cache.annotation.CacheEvict;
+
 
 @Service
 public class ReelService {
@@ -37,6 +41,7 @@ public class ReelService {
     }
 
     // Create reel
+    @CacheEvict(value = "reelFeed", allEntries = true)
     public ReelResponseDTO createReel(ReelRequestDTO requestDTO) {
 
         Reel reel = reelMapper.toEntity(requestDTO);
@@ -80,6 +85,7 @@ public class ReelService {
     }
 
     // Update reel
+    @CacheEvict(value = "reelFeed", allEntries = true)
     public ReelResponseDTO updateReel(
             Long id,
             ReelRequestDTO requestDTO) {
@@ -99,6 +105,7 @@ public class ReelService {
     }
 
     // Delete reel
+    @CacheEvict(value = "reelFeed", allEntries = true)
     public void deleteReel(Long id) {
 
         Reel reel = findReelById(id);
@@ -122,9 +129,13 @@ public class ReelService {
                         "Food not found with id: " + id));
     }
 
-    public Page<ReelResponseDTO> getReelFeed(
+    @Cacheable(value = "reelFeed", key = "'page:' + #page + ':size:' + #size")
+    public ReelFeedPageDTO getReelFeed(
             int page,
             int size) {
+
+        System.out.println(
+                "DATABASE FEED METHOD EXECUTED - CACHE MISS");
 
         Pageable pageable = PageRequest.of(
                 page,
@@ -135,7 +146,19 @@ public class ReelService {
 
         Page<Reel> reels = reelRepository.findAll(pageable);
 
-        return reels.map(reelMapper::toResponseDTO);
+        List<ReelResponseDTO> content = reels.getContent()
+                .stream()
+                .map(reelMapper::toResponseDTO)
+                .toList();
+
+        return new ReelFeedPageDTO(
+                content,
+                reels.getTotalElements(),
+                reels.getTotalPages(),
+                reels.getNumber(),
+                reels.getSize(),
+                reels.isFirst(),
+                reels.isLast());
     }
 
     public Page<ReelResponseDTO> discoverReels(
@@ -163,7 +186,11 @@ public class ReelService {
                 .map(reelMapper::toResponseDTO);
     }
 
+    @CacheEvict(value = "reelFeed", allEntries = true)
     public ViewResponseDTO incrementViewCount(Long reelId) {
+
+        System.out.println(
+                "VIEW UPDATED - REEL FEED CACHE SHOULD BE EVICTED");
 
         Reel reel = reelRepository.findById(reelId)
                 .orElseThrow(() -> new ReelNotFoundException(
@@ -175,7 +202,8 @@ public class ReelService {
             currentViewCount = 0L;
         }
 
-        reel.setViewCount(currentViewCount + 1);
+        reel.setViewCount(
+                currentViewCount + 1);
 
         Reel updatedReel = reelRepository.save(reel);
 

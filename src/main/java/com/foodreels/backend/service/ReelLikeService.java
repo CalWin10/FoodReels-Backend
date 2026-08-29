@@ -1,5 +1,6 @@
 package com.foodreels.backend.service;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import com.foodreels.backend.dto.LikeResponseDTO;
@@ -15,119 +16,113 @@ import com.foodreels.backend.repository.UserRepository;
 @Service
 public class ReelLikeService {
 
-    private final ReelLikeRepository reelLikeRepository;
-    private final ReelRepository reelRepository;
-    private final UserRepository userRepository;
+        private final ReelLikeRepository reelLikeRepository;
+        private final ReelRepository reelRepository;
+        private final UserRepository userRepository;
+        private final PersonalizedFeedCacheService cacheService;
 
-    public ReelLikeService(
-            ReelLikeRepository reelLikeRepository,
-            ReelRepository reelRepository,
-            UserRepository userRepository) {
+        public ReelLikeService(
+                        ReelLikeRepository reelLikeRepository,
+                        ReelRepository reelRepository,
+                        UserRepository userRepository, PersonalizedFeedCacheService cacheService) {
 
-        this.reelLikeRepository = reelLikeRepository;
-        this.reelRepository = reelRepository;
-        this.userRepository = userRepository;
-    }
-
-    // Like a reel
-    public LikeResponseDTO likeReel(
-            Long reelId,
-            String email) {
-
-        User user = findUserByEmail(email);
-        Reel reel = findReelById(reelId);
-
-        boolean alreadyLiked =
-                reelLikeRepository.existsByUser_IdAndReel_Id(
-                        user.getId(),
-                        reelId
-                );
-
-        // Keep POST idempotent
-        if (!alreadyLiked) {
-
-            ReelLike like = new ReelLike();
-
-            like.setUser(user);
-            like.setReel(reel);
-
-            reelLikeRepository.save(like);
+                this.reelLikeRepository = reelLikeRepository;
+                this.reelRepository = reelRepository;
+                this.userRepository = userRepository;
+                this.cacheService = cacheService;
         }
 
-        long likeCount =
-                reelLikeRepository.countByReel_Id(reelId);
+        // Like a reel
+        @CacheEvict(value = "personalizedFeed", allEntries = true)
+        public LikeResponseDTO likeReel(
+                        Long reelId,
+                        String email) {
 
-        return new LikeResponseDTO(
-                true,
-                likeCount
-        );
-    }
+                User user = findUserByEmail(email);
+                Reel reel = findReelById(reelId);
 
-    // Unlike a reel
-    public LikeResponseDTO unlikeReel(
-            Long reelId,
-            String email) {
+                boolean alreadyLiked = reelLikeRepository.existsByUser_IdAndReel_Id(
+                                user.getId(),
+                                reelId);
+                cacheService.evictUserPersonalizedFeed(
+                                email);
 
-        User user = findUserByEmail(email);
+                // Keep POST idempotent
+                if (!alreadyLiked) {
 
-        // Also verifies that reel exists
-        findReelById(reelId);
+                        ReelLike like = new ReelLike();
 
-        reelLikeRepository
-                .findByUser_IdAndReel_Id(
-                        user.getId(),
-                        reelId
-                )
-                .ifPresent(reelLikeRepository::delete);
+                        like.setUser(user);
+                        like.setReel(reel);
 
-        long likeCount =
-                reelLikeRepository.countByReel_Id(reelId);
+                        reelLikeRepository.save(like);
+                }
 
-        return new LikeResponseDTO(
-                false,
-                likeCount
-        );
-    }
+                long likeCount = reelLikeRepository.countByReel_Id(reelId);
 
-    // Check current user's like status
-    public LikeResponseDTO getLikeStatus(
-            Long reelId,
-            String email) {
+                return new LikeResponseDTO(
+                                true,
+                                likeCount);
+        }
 
-        User user = findUserByEmail(email);
+        // Unlike a reel
+        @CacheEvict(value = "personalizedFeed", allEntries = true)
+        public LikeResponseDTO unlikeReel(
+                        Long reelId,
+                        String email) {
 
-        findReelById(reelId);
+                User user = findUserByEmail(email);
 
-        boolean liked =
-                reelLikeRepository.existsByUser_IdAndReel_Id(
-                        user.getId(),
-                        reelId
-                );
+                // Also verifies that reel exists
+                findReelById(reelId);
 
-        long likeCount =
-                reelLikeRepository.countByReel_Id(reelId);
+                reelLikeRepository
+                                .findByUser_IdAndReel_Id(
+                                                user.getId(),
+                                                reelId)
+                                .ifPresent(reelLikeRepository::delete);
 
-        return new LikeResponseDTO(
-                liked,
-                likeCount
-        );
-    }
+                long likeCount = reelLikeRepository.countByReel_Id(reelId);
 
-    private User findUserByEmail(String email) {
+                cacheService.evictUserPersonalizedFeed(
+                                email);
 
-        return userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "User not found"
-                        ));
-    }
+                return new LikeResponseDTO(
+                                false,
+                                likeCount);
+        }
 
-    private Reel findReelById(Long reelId) {
+        // Check current user's like status
+        public LikeResponseDTO getLikeStatus(
+                        Long reelId,
+                        String email) {
 
-        return reelRepository.findById(reelId)
-                .orElseThrow(() ->
-                        new ReelNotFoundException(
-                                "Reel not found with id: " + reelId
-                        ));
-    }
+                User user = findUserByEmail(email);
+
+                findReelById(reelId);
+
+                boolean liked = reelLikeRepository.existsByUser_IdAndReel_Id(
+                                user.getId(),
+                                reelId);
+
+                long likeCount = reelLikeRepository.countByReel_Id(reelId);
+
+                return new LikeResponseDTO(
+                                liked,
+                                likeCount);
+        }
+
+        private User findUserByEmail(String email) {
+
+                return userRepository.findByEmail(email)
+                                .orElseThrow(() -> new UserNotFoundException(
+                                                "User not found"));
+        }
+
+        private Reel findReelById(Long reelId) {
+
+                return reelRepository.findById(reelId)
+                                .orElseThrow(() -> new ReelNotFoundException(
+                                                "Reel not found with id: " + reelId));
+        }
 }
