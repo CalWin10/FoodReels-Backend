@@ -27,15 +27,14 @@ public class PersonalizedFeedCacheService {
         Set<String> keys =
                 redisTemplate.keys(pattern);
 
-        if (keys != null
-                && !keys.isEmpty()) {
+        if (keys != null && !keys.isEmpty()) {
 
             redisTemplate.delete(keys);
-        }
 
-        System.out.println(
-                "PERSONALIZED CACHE EVICTED FOR: "
-                        + email
-        );
+            System.out.println(
+                    "PERSONALIZED CACHE EVICTED FOR: "
+                            + email
+            );
+        }
     }
 }

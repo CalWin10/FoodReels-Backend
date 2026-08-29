@@ -19,9 +19,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import com.foodreels.backend.dto.ViewResponseDTO;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+
 import com.foodreels.backend.dto.ReelFeedPageDTO;
 import org.springframework.cache.annotation.CacheEvict;
-
 
 @Service
 public class ReelService {
@@ -41,7 +42,10 @@ public class ReelService {
     }
 
     // Create reel
-    @CacheEvict(value = "reelFeed", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "reelFeed", allEntries = true),
+            @CacheEvict(value = "personalizedFeed", allEntries = true)
+    })
     public ReelResponseDTO createReel(ReelRequestDTO requestDTO) {
 
         Reel reel = reelMapper.toEntity(requestDTO);
