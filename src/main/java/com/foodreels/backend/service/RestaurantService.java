@@ -10,6 +10,7 @@ import com.foodreels.backend.entity.Restaurant;
 import com.foodreels.backend.exception.RestaurantNotFoundException;
 import com.foodreels.backend.mapper.RestaurantMapper;
 import com.foodreels.backend.repository.RestaurantRepository;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 public class RestaurantService {
@@ -26,6 +27,7 @@ public class RestaurantService {
     }
 
     // Create restaurant
+    @CacheEvict(value = "searchResults", allEntries = true)
     public RestaurantResponseDTO createRestaurant(
             RestaurantRequestDTO requestDTO) {
 
@@ -54,6 +56,7 @@ public class RestaurantService {
     }
 
     // Update restaurant
+    @CacheEvict(value = "searchResults", allEntries = true)
     public RestaurantResponseDTO updateRestaurant(
             Long id,
             RestaurantRequestDTO requestDTO) {
@@ -75,6 +78,7 @@ public class RestaurantService {
     }
 
     // Delete restaurant
+    @CacheEvict(value = "searchResults", allEntries = true)
     public void deleteRestaurant(Long id) {
 
         Restaurant restaurant = findRestaurantById(id);

@@ -80,6 +80,13 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
                                                                 HttpMethod.GET,
+                                                                "/api/search/**")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
                                                                 "/api/reels/**")
                                                 .hasAnyRole(
                                                                 "USER",
