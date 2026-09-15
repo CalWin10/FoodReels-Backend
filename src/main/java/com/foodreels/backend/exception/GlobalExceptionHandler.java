@@ -23,17 +23,30 @@ import jakarta.validation.ConstraintViolationException;
 public class GlobalExceptionHandler {
 
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidCredentials(
+            InvalidCredentialsException exception, HttpServletRequest request) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateEmail(
+            DuplicateEmailException exception, HttpServletRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, exception.getMessage(), request);
+    }
+
     // =========================================================
-    // RESTAURANT NOT FOUND
+    // RESOURCE NOT FOUND
     // =========================================================
 
     @ExceptionHandler(
-            RestaurantNotFoundException.class
+            {RestaurantNotFoundException.class, FoodNotFoundException.class,
+                    ReelNotFoundException.class, UserNotFoundException.class}
     )
     public ResponseEntity<ApiErrorResponse>
             handleRestaurantNotFound(
 
-                    RestaurantNotFoundException exception,
+                    RuntimeException exception,
                     HttpServletRequest request) {
 
         return buildResponse(

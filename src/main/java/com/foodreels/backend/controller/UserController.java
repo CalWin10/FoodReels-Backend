@@ -1,5 +1,11 @@
 package com.foodreels.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -21,6 +27,8 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "Users", description = "User management APIs.")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
     private final UserService userService;
@@ -30,6 +38,16 @@ public class UserController {
     }
 
     // Create user
+    @Operation(
+            summary = "Create a user",
+            description = "Creates a user from the supplied details. Requires the ADMIN role."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Resource created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(
         @Valid @RequestBody UserRequestDTO userRequestDTO) {
@@ -41,12 +59,34 @@ public class UserController {
     }
 
     // Get all users
+    @Operation(
+            summary = "Get all users",
+            description = "Returns all users. Requires the ADMIN role."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @GetMapping
     public List<UserResponseDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     // Get user by id
+    @Operation(
+            summary = "Get a user",
+            description = "Returns the user identified by its ID. Requires the ADMIN role.",
+            parameters = {
+                    @Parameter(name = "id", description = "User ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(
             @PathVariable Long id) {
@@ -58,6 +98,19 @@ public class UserController {
     }
 
     // Update user
+    @Operation(
+            summary = "Update a user",
+            description = "Updates the specified user using the supplied details. Requires the ADMIN role.",
+            parameters = {
+                    @Parameter(name = "id", description = "User ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable Long id,
@@ -69,6 +122,19 @@ public class UserController {
     }
 
     // Delete user
+    @Operation(
+            summary = "Delete a user",
+            description = "Deletes the specified user. Requires the ADMIN role.",
+            parameters = {
+                    @Parameter(name = "id", description = "User ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);

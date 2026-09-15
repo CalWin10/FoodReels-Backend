@@ -1,5 +1,9 @@
 package com.foodreels.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -51,6 +55,17 @@ public class RestaurantController {
     // CREATE RESTAURANT
     // =========================================================
 
+    @Operation(
+            summary = "Create a restaurant",
+            description = "Creates a restaurant associated with the authenticated user. Requires the RESTAURANT_OWNER or ADMIN role."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Resource created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @PostMapping
     public ResponseEntity<RestaurantResponseDTO>
             createRestaurant(
@@ -86,6 +101,15 @@ public class RestaurantController {
     // GET ALL RESTAURANTS
     // =========================================================
 
+    @Operation(
+            summary = "Get all restaurants",
+            description = "Returns all restaurants available in FoodReels."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @GetMapping
     public ResponseEntity<
             List<RestaurantResponseDTO>>
@@ -103,6 +127,20 @@ public class RestaurantController {
     // GET RESTAURANT BY ID
     // =========================================================
 
+    @Operation(
+            summary = "Get a restaurant",
+            description = "Returns the restaurant identified by its ID.",
+            parameters = {
+                    @Parameter(name = "id", description = "Restaurant ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<RestaurantResponseDTO>
             getRestaurantById(
@@ -124,6 +162,20 @@ public class RestaurantController {
     // UPDATE RESTAURANT
     // =========================================================
 
+    @Operation(
+            summary = "Update a restaurant",
+            description = "Updates a restaurant owned by the authenticated user. Admins can also update restaurants.",
+            parameters = {
+                    @Parameter(name = "id", description = "Restaurant ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<RestaurantResponseDTO>
             updateRestaurant(
@@ -165,6 +217,20 @@ public class RestaurantController {
     // DELETE RESTAURANT
     // =========================================================
 
+    @Operation(
+            summary = "Delete a restaurant",
+            description = "Deletes a restaurant owned by the authenticated user. Admins can also delete restaurants.",
+            parameters = {
+                    @Parameter(name = "id", description = "Restaurant ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Resource deleted successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>
             deleteRestaurant(

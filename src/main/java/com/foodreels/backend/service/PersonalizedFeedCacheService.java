@@ -31,10 +31,6 @@ public class PersonalizedFeedCacheService {
 
             redisTemplate.delete(keys);
 
-            System.out.println(
-                    "PERSONALIZED CACHE EVICTED FOR: "
-                            + email
-            );
         }
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -537,7 +539,7 @@ public class OrderService {
         // CHECK RESTAURANT EXISTS
         // -----------------------------------------------------
 
-        restaurantRepository
+        Restaurant restaurant = restaurantRepository
                 .findById(
                         restaurantId
                 )
@@ -549,6 +551,8 @@ public class OrderService {
                             )
                 );
 
+
+        validateRestaurantAccess(restaurant);
 
         page =
                 normalizePage(
@@ -641,6 +645,8 @@ public class OrderService {
                         orderId
                 );
 
+
+        validateRestaurantAccess(order.getRestaurant());
 
         OrderStatus currentStatus =
                 order.getStatus();
@@ -848,6 +854,26 @@ public class OrderService {
         };
     }
 
+
+    // =========================================================
+    // RESTAURANT ORDER ACCESS
+    // =========================================================
+
+    private void validateRestaurantAccess(Restaurant restaurant) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Restaurant access denied");
+        }
+        boolean admin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+        if (admin) {
+            return;
+        }
+        if (restaurant.getOwner() == null
+                || !authentication.getName().equalsIgnoreCase(restaurant.getOwner().getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this restaurant");
+        }
+    }
 
     // =========================================================
     // FIND USER

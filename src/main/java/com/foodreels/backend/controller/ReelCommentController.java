@@ -1,5 +1,10 @@
 package com.foodreels.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -24,6 +29,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api")
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Comments", description = "Reel comment creation, retrieval and deletion APIs.")
 public class ReelCommentController {
 
     private final ReelCommentService commentService;
@@ -34,6 +40,19 @@ public class ReelCommentController {
         this.commentService = commentService;
     }
 
+    @Operation(
+            summary = "Create a comment",
+            description = "Adds a comment to the specified reel for the authenticated user.",
+            parameters = {
+                    @Parameter(name = "reelId", description = "Reel ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Resource created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @PostMapping("/reels/{reelId}/comments")
     public ResponseEntity<CommentResponseDTO> createComment(
             @PathVariable Long reelId,
@@ -54,6 +73,18 @@ public class ReelCommentController {
                 .body(response);
     }
 
+    @Operation(
+            summary = "Get reel comments",
+            description = "Returns comments belonging to the specified reel.",
+            parameters = {
+                    @Parameter(name = "reelId", description = "Reel ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required")
+    })
     @GetMapping("/reels/{reelId}/comments")
     public ResponseEntity<List<CommentResponseDTO>>
             getCommentsByReel(
@@ -64,6 +95,19 @@ public class ReelCommentController {
         );
     }
 
+    @Operation(
+            summary = "Delete a comment",
+            description = "Deletes a comment when the authenticated user is its author or an admin.",
+            parameters = {
+                    @Parameter(name = "commentId", description = "Comment ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Resource deleted successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId,

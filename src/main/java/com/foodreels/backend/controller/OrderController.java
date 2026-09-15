@@ -1,5 +1,9 @@
 package com.foodreels.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +55,17 @@ public class OrderController {
     // CREATE ORDER
     // =========================================================
 
+    @Operation(
+            summary = "Create an order",
+            description = "Creates an order for the authenticated user with items from a single restaurant. Food prices and totals are calculated by the backend."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Resource created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @PostMapping
     public ResponseEntity<OrderResponseDTO>
             createOrder(
@@ -85,6 +100,22 @@ public class OrderController {
     // MY ORDERS
     // =========================================================
 
+    @Operation(
+            summary = "Get my orders",
+            description = "Returns paginated orders belonging to the authenticated user with optional status filtering.",
+            parameters = {
+                    @Parameter(name = "status", description = "Filter orders by status", example = "CREATED"),
+                    @Parameter(name = "page", description = "Zero-based page number", example = "0"),
+                    @Parameter(name = "size", description = "Number of results per page", example = "10")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @GetMapping
     public ResponseEntity<
             Page<OrderResponseDTO>>
@@ -126,6 +157,23 @@ public class OrderController {
     // RESTAURANT ORDERS
     // =========================================================
 
+    @Operation(
+            summary = "Get restaurant orders",
+            description = "Returns paginated orders for the specified restaurant with optional status filtering. Requires the RESTAURANT_OWNER or ADMIN role.",
+            parameters = {
+                    @Parameter(name = "restaurantId", description = "Restaurant ID", example = "1"),
+                    @Parameter(name = "status", description = "Filter orders by status", example = "CREATED"),
+                    @Parameter(name = "page", description = "Zero-based page number", example = "0"),
+                    @Parameter(name = "size", description = "Number of results per page", example = "10")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @GetMapping(
             "/restaurant/{restaurantId}"
     )
@@ -169,6 +217,20 @@ public class OrderController {
     // GET ONE OF MY ORDERS
     // =========================================================
 
+    @Operation(
+            summary = "Get one of my orders",
+            description = "Returns the specified order if it belongs to the authenticated user.",
+            parameters = {
+                    @Parameter(name = "orderId", description = "Order ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDTO>
             getMyOrder(
@@ -195,6 +257,20 @@ public class OrderController {
     // UPDATE ORDER STATUS
     // =========================================================
 
+    @Operation(
+            summary = "Update order status",
+            description = "Updates an order through the allowed lifecycle transitions. Submitting its current status returns the order unchanged. Requires the RESTAURANT_OWNER or ADMIN role.",
+            parameters = {
+                    @Parameter(name = "orderId", description = "Order ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @PatchMapping(
             "/{orderId}/status"
     )
@@ -224,6 +300,20 @@ public class OrderController {
     // CANCEL MY ORDER
     // =========================================================
 
+    @Operation(
+            summary = "Cancel my order",
+            description = "Cancels an order belonging to the authenticated user while its status is CREATED.",
+            parameters = {
+                    @Parameter(name = "orderId", description = "Order ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Requested resource or associated user not found")
+    })
     @PostMapping(
             "/{orderId}/cancel"
     )

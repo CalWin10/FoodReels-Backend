@@ -123,16 +123,6 @@ public class RecommendationService {
             int page,
             int size) {
 
-        /*
-         * If this message appears:
-         * Redis did NOT contain the requested personalized feed.
-         *
-         * If the same request is sent again and this does NOT appear:
-         * Redis CACHE HIT.
-         */
-        System.out.println(
-                "PERSONALIZED FEED CALCULATED - CACHE MISS"
-        );
 
         // -----------------------------------------------------
         // Defensive pagination

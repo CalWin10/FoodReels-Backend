@@ -1,5 +1,10 @@
 package com.foodreels.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -23,6 +28,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/foods")
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Foods", description = "Food item management and restaurant menu APIs.")
 public class FoodController {
 
     private final FoodService foodService;
@@ -32,6 +38,17 @@ public class FoodController {
     }
 
     // Create food
+    @Operation(
+            summary = "Create a food item",
+            description = "Creates a food item linked to a restaurant. Requires the RESTAURANT_OWNER or ADMIN role."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Resource created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Restaurant not found")
+    })
     @PostMapping
     public ResponseEntity<FoodResponseDTO> createFood(
             @Valid @RequestBody FoodRequestDTO requestDTO) {
@@ -45,6 +62,15 @@ public class FoodController {
     }
 
     // Get all foods
+    @Operation(
+            summary = "Get all food items",
+            description = "Returns all food items available in FoodReels."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @GetMapping
     public ResponseEntity<List<FoodResponseDTO>> getAllFoods() {
 
@@ -55,6 +81,19 @@ public class FoodController {
     }
 
     // Get food by ID
+    @Operation(
+            summary = "Get a food item",
+            description = "Returns the food item identified by its ID.",
+            parameters = {
+                    @Parameter(name = "id", description = "Food ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<FoodResponseDTO> getFoodById(
             @PathVariable Long id) {
@@ -66,6 +105,20 @@ public class FoodController {
     }
 
     // Get foods belonging to a restaurant
+    @Operation(
+            summary = "Get a restaurant menu",
+            description = "Returns food items belonging to the specified restaurant.",
+            parameters = {
+                    @Parameter(name = "restaurantId", description = "Restaurant ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Restaurant not found")
+    })
     @GetMapping("/restaurant/{restaurantId}")
     public ResponseEntity<List<FoodResponseDTO>> getFoodsByRestaurant(
             @PathVariable Long restaurantId) {
@@ -77,6 +130,20 @@ public class FoodController {
     }
 
     // Update food
+    @Operation(
+            summary = "Update a food item",
+            description = "Updates the specified food item using the supplied details. Requires the RESTAURANT_OWNER or ADMIN role.",
+            parameters = {
+                    @Parameter(name = "id", description = "Food ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Request completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Restaurant not found")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<FoodResponseDTO> updateFood(
             @PathVariable Long id,
@@ -89,6 +156,19 @@ public class FoodController {
     }
 
     // Delete food
+    @Operation(
+            summary = "Delete a food item",
+            description = "Deletes the specified food item. Requires the RESTAURANT_OWNER or ADMIN role.",
+            parameters = {
+                    @Parameter(name = "id", description = "Food ID", example = "1")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Resource deleted successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body or parameters"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFood(
             @PathVariable Long id) {

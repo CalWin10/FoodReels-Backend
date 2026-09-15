@@ -3,6 +3,7 @@ package com.foodreels.backend.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.foodreels.backend.dto.UserRequestDTO;
 import com.foodreels.backend.dto.UserResponseDTO;
@@ -17,13 +18,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(
             UserRepository userRepository,
-            UserMapper userMapper) {
+            UserMapper userMapper,
+            PasswordEncoder passwordEncoder) {
 
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Create user
@@ -31,6 +35,7 @@ public class UserService {
             UserRequestDTO userRequestDTO) {
 
         User user = userMapper.toEntity(userRequestDTO);
+        user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
 
         User savedUser = userRepository.save(user);
 
@@ -66,7 +71,7 @@ public class UserService {
 
         existingUser.setName(userRequestDTO.getName());
         existingUser.setEmail(userRequestDTO.getEmail());
-        existingUser.setPassword(userRequestDTO.getPassword());
+        existingUser.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         existingUser.setProfileImageUrl(
                 userRequestDTO.getProfileImageUrl());
         existingUser.setRole(userRequestDTO.getRole());

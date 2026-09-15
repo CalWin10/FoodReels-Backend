@@ -72,7 +72,7 @@ public class AuthService {
         User user = userRepository
                 .findByEmail(loginRequestDTO.getEmail())
                 .orElseThrow(() ->
-                        new RuntimeException("Invalid email or password")
+                        new InvalidCredentialsException("Invalid email or password")
                 );
 
         // Compare raw password with BCrypt hash in database

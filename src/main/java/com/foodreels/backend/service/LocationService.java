@@ -99,9 +99,6 @@ public class LocationService {
                     double userLongitude,
                     double radiusKm) {
 
-        System.out.println(
-                "LOCATION DISCOVERY DATABASE EXECUTED - CACHE MISS"
-        );
 
         validateLocationRequest(
                 userLatitude,

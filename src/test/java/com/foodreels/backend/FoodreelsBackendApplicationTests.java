@@ -1,10 +1,9 @@
 package com.foodreels.backend;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import com.foodreels.backend.support.BackendIntegrationTest;
 
-@SpringBootTest
-class FoodreelsBackendApplicationTests {
+class FoodreelsBackendApplicationTests extends BackendIntegrationTest {
 
 	@Test
 	void contextLoads() {

@@ -239,10 +239,6 @@ public class SearchService {
             int page,
             int size) {
 
-        System.out.println(
-                "SEARCH DATABASE EXECUTED - CACHE MISS: "
-                        + q
-        );
 
         page = normalizePage(page);
         size = normalizeSize(size);

@@ -162,8 +162,6 @@ public class ReelService {
                         int page,
                         int size) {
 
-                System.out.println(
-                                "DATABASE FEED METHOD EXECUTED - CACHE MISS");
 
                 Pageable pageable = PageRequest.of(
                                 page,
@@ -217,8 +215,6 @@ public class ReelService {
         @CacheEvict(value = "reelFeed", allEntries = true)
         public ViewResponseDTO incrementViewCount(Long reelId) {
 
-                System.out.println(
-                                "VIEW UPDATED - REEL FEED CACHE SHOULD BE EVICTED");
 
                 Reel reel = reelRepository.findById(reelId)
                                 .orElseThrow(() -> new ReelNotFoundException(

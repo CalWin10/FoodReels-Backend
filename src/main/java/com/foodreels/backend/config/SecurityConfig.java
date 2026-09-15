@@ -24,19 +24,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.nio.charset.StandardCharsets;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import com.foodreels.backend.exception.ApiErrorResponse;
+import tools.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 
 @Configuration
 public class SecurityConfig {
+        private final ObjectMapper objectMapper;
+
+        public SecurityConfig(ObjectMapper objectMapper) {
+                this.objectMapper = objectMapper;
+        }
+
         @Value("${security.jwt.secret}")
         private String jwtSecret;
 
@@ -405,14 +404,9 @@ public class SecurityConfig {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         response.setContentType("application/json");
 
-                        response.getWriter().write(
-                                        """
-                                                        {
-                                                            "status": 401,
-                                                            "error": "Unauthorized",
-                                                            "message": "Authentication is required"
-                                                        }
-                                                        """);
+                        objectMapper.writeValue(response.getWriter(), new ApiErrorResponse(
+                                LocalDateTime.now(), 401, "Unauthorized",
+                                "Authentication is required", request.getRequestURI()));
                 };
         }
 
@@ -424,14 +418,9 @@ public class SecurityConfig {
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.setContentType("application/json");
 
-                        response.getWriter().write(
-                                        """
-                                                        {
-                                                            "status": 403,
-                                                            "error": "Forbidden",
-                                                            "message": "You do not have permission to access this resource"
-                                                        }
-                                                        """);
+                        objectMapper.writeValue(response.getWriter(), new ApiErrorResponse(
+                                LocalDateTime.now(), 403, "Forbidden",
+                                "You do not have permission to access this resource", request.getRequestURI()));
                 };
         }
 
