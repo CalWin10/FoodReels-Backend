@@ -14,6 +14,7 @@ import com.foodreels.backend.mapper.FoodMapper;
 import com.foodreels.backend.repository.FoodRepository;
 import com.foodreels.backend.repository.RestaurantRepository;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 @Service
 public class FoodService {
@@ -33,7 +34,12 @@ public class FoodService {
     }
 
     // Create food
-    @CacheEvict(value = "searchResults", allEntries = true)
+    @Caching(evict = {
+
+            @CacheEvict(value = "searchResults", allEntries = true),
+
+            @CacheEvict(value = "nearbyDiscovery", allEntries = true)
+    })
     public FoodResponseDTO createFood(FoodRequestDTO requestDTO) {
 
         Food food = foodMapper.toEntity(requestDTO);
@@ -78,7 +84,12 @@ public class FoodService {
     }
 
     // Update food
-    @CacheEvict(value = "searchResults", allEntries = true)
+    @Caching(evict = {
+
+            @CacheEvict(value = "searchResults", allEntries = true),
+
+            @CacheEvict(value = "nearbyDiscovery", allEntries = true)
+    })
     public FoodResponseDTO updateFood(
             Long id,
             FoodRequestDTO requestDTO) {
@@ -102,7 +113,12 @@ public class FoodService {
     }
 
     // Delete food
-    @CacheEvict(value = "searchResults", allEntries = true)
+    @Caching(evict = {
+
+            @CacheEvict(value = "searchResults", allEntries = true),
+
+            @CacheEvict(value = "nearbyDiscovery", allEntries = true)
+    })
     public void deleteFood(Long id) {
 
         Food food = findFoodById(id);

@@ -1,0 +1,18 @@
+package com.foodreels.backend.entity;
+
+public enum OrderStatus {
+
+    CREATED,
+
+    CONFIRMED,
+
+    PREPARING,
+
+    READY,
+
+    OUT_FOR_DELIVERY,
+
+    DELIVERED,
+
+    CANCELLED
+}

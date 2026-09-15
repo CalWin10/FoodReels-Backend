@@ -16,8 +16,11 @@ import com.foodreels.backend.dto.ReelResponseDTO;
 import com.foodreels.backend.dto.SaveResponseDTO;
 import com.foodreels.backend.service.ReelSaveService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequestMapping("/api")
+@SecurityRequirement(name = "bearerAuth")
 public class ReelSaveController {
 
     private final ReelSaveService reelSaveService;

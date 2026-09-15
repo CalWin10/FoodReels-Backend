@@ -14,61 +14,74 @@ public interface FoodRepository
         extends JpaRepository<Food, Long> {
 
     List<Food> findByRestaurantId(
-            Long restaurantId
-    );
+            Long restaurantId);
 
     // =========================================================
     // PHASE 7 - ADVANCED FOOD SEARCH
     // =========================================================
 
     @Query("""
-        SELECT f
-        FROM Food f
-        WHERE
-            (
-                :q = ''
-                OR LOWER(f.name)
-                    LIKE LOWER(CONCAT('%', :q, '%'))
-                OR LOWER(f.description)
-                    LIKE LOWER(CONCAT('%', :q, '%'))
-                OR LOWER(f.category)
-                    LIKE LOWER(CONCAT('%', :q, '%'))
-                OR LOWER(f.restaurant.name)
-                    LIKE LOWER(CONCAT('%', :q, '%'))
-            )
+                SELECT f
+                FROM Food f
+                WHERE
+                    (
+                        :q = ''
+                        OR LOWER(f.name)
+                            LIKE LOWER(CONCAT('%', :q, '%'))
+                        OR LOWER(f.description)
+                            LIKE LOWER(CONCAT('%', :q, '%'))
+                        OR LOWER(f.category)
+                            LIKE LOWER(CONCAT('%', :q, '%'))
+                        OR LOWER(f.restaurant.name)
+                            LIKE LOWER(CONCAT('%', :q, '%'))
+                    )
 
-            AND (
-                :category = ''
-                OR LOWER(f.category)
-                    = LOWER(:category)
-            )
+                    AND (
+                        :category = ''
+                        OR LOWER(f.category)
+                            = LOWER(:category)
+                    )
 
-            AND (
-                :restaurantId = 0
-                OR f.restaurant.id = :restaurantId
-            )
+                    AND (
+                        :restaurantId = 0
+                        OR f.restaurant.id = :restaurantId
+                    )
 
-            AND f.price >= :minPrice
+                    AND f.price >= :minPrice
 
-            AND f.price <= :maxPrice
-    """)
+                    AND f.price <= :maxPrice
+            """)
     Page<Food> searchFoods(
 
-            @Param("q")
-            String q,
+            @Param("q") String q,
 
-            @Param("category")
-            String category,
+            @Param("category") String category,
 
-            @Param("restaurantId")
-            Long restaurantId,
+            @Param("restaurantId") Long restaurantId,
 
-            @Param("minPrice")
-            Double minPrice,
+            @Param("minPrice") Double minPrice,
 
-            @Param("maxPrice")
-            Double maxPrice,
+            @Param("maxPrice") Double maxPrice,
 
-            Pageable pageable
-    );
+            Pageable pageable);
+
+    @Query("""
+                SELECT f
+                FROM Food f
+                JOIN f.restaurant r
+                WHERE
+                    r.latitude IS NOT NULL
+                    AND r.longitude IS NOT NULL
+                    AND r.latitude BETWEEN :minLat AND :maxLat
+                    AND r.longitude BETWEEN :minLng AND :maxLng
+            """)
+    List<Food> findNearbyCandidates(
+
+            @Param("minLat") double minLat,
+
+            @Param("maxLat") double maxLat,
+
+            @Param("minLng") double minLng,
+
+            @Param("maxLng") double maxLng);
 }

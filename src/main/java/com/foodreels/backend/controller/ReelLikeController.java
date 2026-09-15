@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.foodreels.backend.dto.LikeResponseDTO;
 import com.foodreels.backend.service.ReelLikeService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequestMapping("/api/reels")
+@SecurityRequirement(name = "bearerAuth")
 public class ReelLikeController {
 
     private final ReelLikeService reelLikeService;

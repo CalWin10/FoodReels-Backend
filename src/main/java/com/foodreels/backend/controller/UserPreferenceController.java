@@ -18,10 +18,12 @@ import com.foodreels.backend.dto.PreferenceRequestDTO;
 import com.foodreels.backend.dto.PreferenceResponseDTO;
 import com.foodreels.backend.service.UserPreferenceService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/preferences")
+@SecurityRequirement(name = "bearerAuth")
 public class UserPreferenceController {
 
     private final UserPreferenceService preferenceService;

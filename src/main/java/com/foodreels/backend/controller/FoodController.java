@@ -17,10 +17,12 @@ import com.foodreels.backend.dto.FoodRequestDTO;
 import com.foodreels.backend.dto.FoodResponseDTO;
 import com.foodreels.backend.service.FoodService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/foods")
+@SecurityRequirement(name = "bearerAuth")
 public class FoodController {
 
     private final FoodService foodService;

@@ -79,6 +79,161 @@ public class SecurityConfig {
 
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
+                                                                "/swagger-ui.html",
+                                                                "/swagger-ui/**",
+                                                                "/v3/api-docs",
+                                                                "/v3/api-docs/**")
+                                                .permitAll()
+                                                .requestMatchers(
+                                                                "/actuator/health",
+                                                                "/actuator/health/**")
+                                                .permitAll()
+
+                                                .requestMatchers(
+                                                                "/actuator/info")
+                                                .permitAll()
+                                                .requestMatchers(
+                                                                HttpMethod.POST,
+                                                                "/api/restaurants")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.PUT,
+                                                                "/api/restaurants/**")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.DELETE,
+                                                                "/api/restaurants/**")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/restaurants/**")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/orders/restaurant/**")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.PATCH,
+                                                                "/api/orders/*/status")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.POST,
+                                                                "/api/orders/*/cancel")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.POST,
+                                                                "/api/orders")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/orders",
+                                                                "/api/orders/*")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/orders/restaurant/**")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.PATCH,
+                                                                "/api/orders/*/status")
+                                                .hasAnyRole(
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.POST,
+                                                                "/api/orders/*/cancel")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.POST,
+                                                                "/api/orders")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/orders",
+                                                                "/api/orders/*")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.POST,
+                                                                "/api/orders")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/orders",
+                                                                "/api/orders/**")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/location/**")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/location/**")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
+                                                                HttpMethod.GET,
+                                                                "/api/location/**")
+                                                .hasAnyRole(
+                                                                "USER",
+                                                                "RESTAURANT_OWNER",
+                                                                "ADMIN")
+                                                .requestMatchers(
                                                                 HttpMethod.GET,
                                                                 "/api/search/**")
                                                 .hasAnyRole(

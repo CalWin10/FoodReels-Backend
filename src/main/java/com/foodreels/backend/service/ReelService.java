@@ -43,9 +43,14 @@ public class ReelService {
 
         // Create reel
         @Caching(evict = {
+
                         @CacheEvict(value = "reelFeed", allEntries = true),
+
                         @CacheEvict(value = "personalizedFeed", allEntries = true),
-                        @CacheEvict(value = "searchResults", allEntries = true)
+
+                        @CacheEvict(value = "searchResults", allEntries = true),
+
+                        @CacheEvict(value = "nearbyDiscovery", allEntries = true)
         })
         public ReelResponseDTO createReel(ReelRequestDTO requestDTO) {
 
@@ -91,9 +96,14 @@ public class ReelService {
 
         // Update reel
         @Caching(evict = {
+
                         @CacheEvict(value = "reelFeed", allEntries = true),
+
                         @CacheEvict(value = "personalizedFeed", allEntries = true),
-                        @CacheEvict(value = "searchResults", allEntries = true)
+
+                        @CacheEvict(value = "searchResults", allEntries = true),
+
+                        @CacheEvict(value = "nearbyDiscovery", allEntries = true)
         })
         public ReelResponseDTO updateReel(
                         Long id,
@@ -115,9 +125,14 @@ public class ReelService {
 
         // Delete reel
         @Caching(evict = {
+
                         @CacheEvict(value = "reelFeed", allEntries = true),
+
                         @CacheEvict(value = "personalizedFeed", allEntries = true),
-                        @CacheEvict(value = "searchResults", allEntries = true)
+
+                        @CacheEvict(value = "searchResults", allEntries = true),
+
+                        @CacheEvict(value = "nearbyDiscovery", allEntries = true)
         })
         public void deleteReel(Long id) {
 

@@ -21,6 +21,9 @@ import com.foodreels.backend.dto.ReelResponseDTO;
 import com.foodreels.backend.service.RecommendationService;
 import com.foodreels.backend.service.ReelService;
 import com.foodreels.backend.service.WatchHistoryService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import com.foodreels.backend.service.RecommendationService;
@@ -30,6 +33,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/reels")
+@SecurityRequirement(name = "bearerAuth")
 public class ReelController {
 
         private final ReelService reelService;

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,71 +19,206 @@ import com.foodreels.backend.dto.RestaurantRequestDTO;
 import com.foodreels.backend.dto.RestaurantResponseDTO;
 import com.foodreels.backend.service.RestaurantService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/restaurants")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(
+        name = "Restaurants",
+        description = "Restaurant management and discovery APIs"
+)
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
 
-    public RestaurantController(RestaurantService restaurantService) {
-        this.restaurantService = restaurantService;
+
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
+
+    public RestaurantController(
+            RestaurantService restaurantService) {
+
+        this.restaurantService =
+                restaurantService;
     }
 
-    // Create restaurant
-    @PostMapping
-    public ResponseEntity<RestaurantResponseDTO> createRestaurant(
-            @Valid @RequestBody RestaurantRequestDTO requestDTO) {
 
-        RestaurantResponseDTO createdRestaurant =
-                restaurantService.createRestaurant(requestDTO);
+    // =========================================================
+    // CREATE RESTAURANT
+    // =========================================================
+
+    @PostMapping
+    public ResponseEntity<RestaurantResponseDTO>
+            createRestaurant(
+
+                    @AuthenticationPrincipal
+                    Jwt jwt,
+
+                    @Valid
+                    @RequestBody
+                    RestaurantRequestDTO requestDTO) {
+
+        String email =
+                jwt.getSubject();
+
+        RestaurantResponseDTO response =
+                restaurantService
+                        .createRestaurant(
+                                email,
+                                requestDTO
+                        );
 
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(createdRestaurant);
+                .status(
+                        HttpStatus.CREATED
+                )
+                .body(
+                        response
+                );
     }
 
-    // Get all restaurants
+
+    // =========================================================
+    // GET ALL RESTAURANTS
+    // =========================================================
+
     @GetMapping
-    public ResponseEntity<List<RestaurantResponseDTO>> getAllRestaurants() {
+    public ResponseEntity<
+            List<RestaurantResponseDTO>>
+            getAllRestaurants() {
 
-        List<RestaurantResponseDTO> restaurants =
-                restaurantService.getAllRestaurants();
+        return ResponseEntity.ok(
 
-        return ResponseEntity.ok(restaurants);
+                restaurantService
+                        .getAllRestaurants()
+        );
     }
 
-    // Get restaurant by ID
+
+    // =========================================================
+    // GET RESTAURANT BY ID
+    // =========================================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<RestaurantResponseDTO> getRestaurantById(
-            @PathVariable Long id) {
+    public ResponseEntity<RestaurantResponseDTO>
+            getRestaurantById(
 
-        RestaurantResponseDTO restaurant =
-                restaurantService.getRestaurantById(id);
+                    @PathVariable
+                    Long id) {
 
-        return ResponseEntity.ok(restaurant);
+        return ResponseEntity.ok(
+
+                restaurantService
+                        .getRestaurantById(
+                                id
+                        )
+        );
     }
 
-    // Update restaurant
+
+    // =========================================================
+    // UPDATE RESTAURANT
+    // =========================================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<RestaurantResponseDTO> updateRestaurant(
-            @PathVariable Long id,
-            @Valid @RequestBody RestaurantRequestDTO requestDTO) {
+    public ResponseEntity<RestaurantResponseDTO>
+            updateRestaurant(
 
-        RestaurantResponseDTO updatedRestaurant =
-                restaurantService.updateRestaurant(id, requestDTO);
+                    @AuthenticationPrincipal
+                    Jwt jwt,
 
-        return ResponseEntity.ok(updatedRestaurant);
+                    @PathVariable
+                    Long id,
+
+                    @Valid
+                    @RequestBody
+                    RestaurantRequestDTO requestDTO) {
+
+        String email =
+                jwt.getSubject();
+
+        boolean admin =
+                isAdmin(
+                        jwt
+                );
+
+        RestaurantResponseDTO response =
+                restaurantService
+                        .updateRestaurant(
+                                email,
+                                admin,
+                                id,
+                                requestDTO
+                        );
+
+        return ResponseEntity.ok(
+                response
+        );
     }
 
-    // Delete restaurant
+
+    // =========================================================
+    // DELETE RESTAURANT
+    // =========================================================
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRestaurant(
-            @PathVariable Long id) {
+    public ResponseEntity<Void>
+            deleteRestaurant(
 
-        restaurantService.deleteRestaurant(id);
+                    @AuthenticationPrincipal
+                    Jwt jwt,
 
-        return ResponseEntity.noContent().build();
+                    @PathVariable
+                    Long id) {
+
+        String email =
+                jwt.getSubject();
+
+        boolean admin =
+                isAdmin(
+                        jwt
+                );
+
+        restaurantService
+                .deleteRestaurant(
+                        email,
+                        admin,
+                        id
+                );
+
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+
+    // =========================================================
+    // CHECK ADMIN ROLE FROM JWT
+    // =========================================================
+
+    private boolean isAdmin(
+            Jwt jwt) {
+
+        String role =
+                jwt.getClaimAsString(
+                        "role"
+                );
+
+        if (role == null) {
+
+            return false;
+        }
+
+        return role.equalsIgnoreCase(
+                        "ADMIN"
+                )
+                ||
+                role.equalsIgnoreCase(
+                        "ROLE_ADMIN"
+                );
     }
 }

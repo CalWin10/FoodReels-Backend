@@ -18,10 +18,12 @@ import com.foodreels.backend.dto.CommentRequestDTO;
 import com.foodreels.backend.dto.CommentResponseDTO;
 import com.foodreels.backend.service.ReelCommentService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
+@SecurityRequirement(name = "bearerAuth")
 public class ReelCommentController {
 
     private final ReelCommentService commentService;
