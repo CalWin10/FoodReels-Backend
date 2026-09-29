@@ -1,318 +1,267 @@
-```html
-<h1 align="center">🍔 FoodReels</h1>
+# 🍔 FoodReels Backend
 
 <p align="center">
-  <strong>Short-form food discovery and ordering platform</strong>
+  <strong>A short-form food discovery and ordering backend built with Spring Boot</strong>
 </p>
 
 <p align="center">
-  Discover food through reels → Explore restaurants → Find dishes → Order
+  Watch → Discover → Decide → Order
 </p>
-
-<hr>
-
-<h2>🚀 Overview</h2>
-
-<p>
-  <strong>FoodReels</strong> is a full-stack food discovery platform built around
-  short-form food videos.
-</p>
-
-<p>Users can:</p>
-
-<ul>
-  <li>🎬 Discover food through reels</li>
-  <li>❤️ Like and save content</li>
-  <li>💬 Comment on food content</li>
-  <li>🔍 Search foods, restaurants and reels</li>
-  <li>📍 Discover nearby food</li>
-  <li>🛒 Add food to a cart</li>
-  <li>📦 Place and track orders</li>
-  <li>🧠 Receive personalized recommendations</li>
-</ul>
-
-<hr>
-
-<h2>🛠️ Tech Stack</h2>
-
-<h3>Backend</h3>
-
-<ul>
-  <li>Java 25</li>
-  <li>Spring Boot</li>
-  <li>Spring Security</li>
-  <li>JWT</li>
-  <li>Spring Data JPA</li>
-  <li>Hibernate</li>
-  <li>PostgreSQL</li>
-  <li>Redis</li>
-  <li>Maven</li>
-  <li>Flyway</li>
-</ul>
-
-<h3>Frontend</h3>
-
-<ul>
-  <li>React</li>
-  <li>TypeScript</li>
-  <li>Vite</li>
-  <li>Tailwind CSS</li>
-  <li>React Router</li>
-  <li>Axios</li>
-  <li>Vitest</li>
-  <li>Testing Library</li>
-</ul>
-
-<h3>Tools</h3>
-
-<ul>
-  <li>Git &amp; GitHub</li>
-  <li>Postman</li>
-  <li>Swagger / OpenAPI</li>
-  <li>VS Code</li>
-  <li>Antigravity</li>
-</ul>
-
-<hr>
-
-<h2>🏗️ Architecture</h2>
-
-<pre>
-                    FoodReels
-                        │
-             ┌──────────┴──────────┐
-             │                     │
-        React Frontend       Spring Boot Backend
-             │                     │
-             │                Service Layer
-             │                     │
-             │                Repository
-             │                     │
-             │              ┌──────┴──────┐
-             │              │             │
-             │         PostgreSQL        Redis
-             │
-             └──────────── REST API ────────────┘
-</pre>
-
-<hr>
-
-<h2>📁 Project Structure</h2>
-
-<pre>
-FoodReels/
-├── backend/
-├── frontend/
-├── docs/
-├── .github/
-├── .gitignore
-└── README.md
-</pre>
-
-<hr>
-
-<h2>✨ Features</h2>
-
-<h3>Backend</h3>
-
-<ul>
-  <li>✅ Authentication and JWT authorization</li>
-  <li>✅ Role-based access control</li>
-  <li>✅ User, restaurant, food and reel management</li>
-  <li>✅ Reel feed and personalized feed</li>
-  <li>✅ Likes, saves and comments</li>
-  <li>✅ Watch history and preferences</li>
-  <li>✅ Search and filtering</li>
-  <li>✅ Nearby discovery</li>
-  <li>✅ Cart and ordering</li>
-  <li>✅ Order lifecycle management</li>
-  <li>✅ Redis caching</li>
-  <li>✅ Flyway migrations</li>
-  <li>✅ Global error handling</li>
-  <li>✅ Swagger/OpenAPI</li>
-  <li>✅ Automated testing</li>
-</ul>
-
-<h3>Frontend</h3>
-
-<ul>
-  <li>✅ React + TypeScript foundation</li>
-  <li>✅ Responsive application shell</li>
-  <li>✅ Authentication foundation</li>
-  <li>🚧 Consumer UI and feature development in progress</li>
-</ul>
-
-<hr>
-
-<h2>🎬 Core Experience</h2>
-
-<pre>
-Watch Reel
-    ↓
-Discover Food
-    ↓
-Explore Restaurant
-    ↓
-View Food
-    ↓
-Add to Cart
-    ↓
-Checkout
-    ↓
-Place Order
-</pre>
-
-<hr>
-
-<h2>▶️ Local Development</h2>
-
-<h3>Backend</h3>
-
-<pre>
-cd backend
-.\mvnw.cmd spring-boot:run
-</pre>
-
-<p>
-  Backend:
-  <code>http://localhost:8080</code>
-</p>
-
-<h3>Frontend</h3>
-
-<pre>
-cd frontend
-npm install
-npm run dev
-</pre>
-
-<hr>
-
-<h2>🧪 Testing</h2>
-
-<h3>Backend</h3>
-
-<pre>
-cd backend
-.\mvnw.cmd test
-</pre>
-
-<h3>Frontend</h3>
-
-<pre>
-npm test -- --run
-</pre>
-
-<h3>Frontend Build</h3>
-
-<pre>
-npm run build
-</pre>
-
-<hr>
-
-<h2>📚 API Documentation</h2>
-
-<p>
-  <strong>Swagger UI:</strong>
-  <code>http://localhost:8080/swagger-ui.html</code>
-</p>
-
-<p>
-  <strong>OpenAPI:</strong>
-  <code>http://localhost:8080/v3/api-docs</code>
-</p>
-
-<hr>
-
-<h2>🌿 Git Workflow</h2>
-
-<pre>
-main
-  │
-  └── dev
-       │
-       └── feature/*
-</pre>
-
-<p>
-  Development work is done on <code>dev</code>.
-</p>
-
-<pre>
-git switch dev
-git pull
-git switch -c feature/reels
-git add .
-git commit -m "feat: improve reel experience"
-git push -u origin feature/reels
-</pre>
-
-<hr>
-
-<h2>📌 Current Status</h2>
-
-<h3>Backend</h3>
-
-<p>
-  ✅ Core backend<br>
-  ✅ Authentication &amp; authorization<br>
-  ✅ Reels &amp; engagement<br>
-  ✅ Personalized recommendations<br>
-  ✅ Redis caching<br>
-  ✅ Search<br>
-  ✅ Location discovery<br>
-  ✅ Ordering<br>
-  ✅ Production hardening<br>
-  ✅ Automated testing
-</p>
-
-<h3>Frontend</h3>
-
-<p>
-  ✅ React + TypeScript foundation<br>
-  ✅ Responsive application shell<br>
-  ✅ Authentication foundation<br>
-  🚧 UI and feature development in progress
-</p>
-
-<hr>
-
-<h2>📖 Documentation</h2>
-
-<p>
-  Detailed architecture, API documentation, phase documentation, testing
-  information, and engineering notes are available in:
-</p>
-
-<p>
-  <code>docs/</code>
-</p>
-
-<hr>
-
-<h2>👨‍💻 Developer</h2>
-
-<p>
-  <strong>Calwin Samuel</strong>
-</p>
-
-<p>
-  GitHub:
-  <a href="https://github.com/CalWin10">Calwin10</a>
-</p>
-
-<hr>
-
-<h2>📄 License</h2>
-
-<p>
-  MIT License.
-</p>
-
-<hr>
 
 <p align="center">
-  <strong>Discover food. Watch. Decide. Order. 🍔</strong>
+
+![Java](https://img.shields.io/badge/Java-25-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.x-brightgreen)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791)
+![Maven](https://img.shields.io/badge/Maven-Build-red)
+![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
+
 </p>
+
+---
+
+## 🚀 Overview
+
+**FoodReels** is a food discovery platform inspired by short-form video apps. Instead of starting with a restaurant search, users discover food by scrolling through **food reels**, then view the dish, check the restaurant, and order through a supported platform.
+
+```text
+Watch a reel → Discover a dish → View restaurant → View food → Order
 ```
+
+This repository contains the backend: APIs, persistence, business logic, authentication, recommendations, and ordering integration.
+
+---
+
+## 🎯 Problem Statement
+
+Traditional food apps are built around search: *search → browse → order*. That works when you know what you want, but many users start with **"I don't know what I want to eat."**
+
+FoodReels flips the model to reduce friction between **discovery and ordering**:
+
+```text
+Traditional:  Search → Browse → Decide
+FoodReels:    Watch → Discover → Desire → Decide → Order
+```
+
+---
+
+## ✨ Key Features
+
+| Area | Features |
+| --- | --- |
+| 👤 Users | Registration, login, profile, roles |
+| 🏪 Restaurants | Details, location, contact info, owned food items |
+| 🍔 Food | Name, price, category, availability, media |
+| 🎬 Reels | Feed, food/restaurant/creator linking, views |
+| ❤️ Engagement | Likes, saves, comments, watch history |
+| 🔍 Search | Food, restaurant, cuisine, price and location filters |
+| 🧠 Recommendations | Personalized feed from watch, like, save and location signals |
+| 🛒 Orders | Cart, order creation, history, status |
+| 🔗 External Ordering | Redirect/integration with providers such as Zomato or Swiggy |
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+| --- | --- |
+| Language | Java 25 |
+| Framework | Spring Boot, Spring Web |
+| Persistence | Spring Data JPA, Hibernate |
+| Database | PostgreSQL |
+| Build | Maven |
+| Tools | VS Code, Git, GitHub, Postman, pgAdmin |
+
+**Planned:** Spring Security, JWT, BCrypt, Redis, Elasticsearch/OpenSearch, Docker, CI/CD, cloud deployment.
+
+---
+
+## 🏛️ Architecture
+
+The project is a **modular monolith** with a layered structure:
+
+```text
+HTTP Request → Controller → DTO → Service → Repository → JPA/Hibernate → PostgreSQL
+```
+
+| Layer | Responsibility |
+| --- | --- |
+| Controller | HTTP requests, responses, routing |
+| Service | Business rules, workflows, transactions |
+| Repository | Database access and queries |
+| Entity | Persistent domain objects |
+| DTO | Controls data exposed through the API |
+| Exception | Centralized, consistent error handling |
+| Config | Security, CORS, beans, external services |
+
+---
+
+## 🗄️ Domain Model
+
+```text
+User ──creates/views──▶ Reel ──represents──▶ Food ──belongs to──▶ Restaurant
+```
+
+**Core tables:** `users`, `restaurants`, `foods`, `reels`
+
+**Planned tables:** `likes`, `saves`, `comments`, `carts`, `cart_items`, `orders`, `order_items`
+
+---
+
+## 🌐 API Design
+
+Planned REST endpoint groups:
+
+```text
+/api/auth          /api/users        /api/restaurants
+/api/foods         /api/reels        /api/comments
+/api/cart          /api/orders
+```
+
+Example (Reels & Engagement):
+
+```http
+POST   /api/reels
+GET    /api/reels
+GET    /api/reels/{id}
+POST   /api/reels/{id}/like
+DELETE /api/reels/{id}/like
+POST   /api/reels/{id}/comments
+```
+
+---
+
+## 🔐 Authentication & Roles
+
+Authentication will use **Spring Security + JWT** with password hashing.
+
+| Role | Responsibilities |
+| --- | --- |
+| `USER` | Browse reels, like, save, comment, order |
+| `RESTAURANT_OWNER` | Manage restaurant and food content |
+| `ADMIN` | Manage users, restaurants, and moderation |
+
+---
+
+## 🧠 Recommendation System
+
+The first version is a rule-based scoring model, before any machine learning:
+
+```text
+Reel Score = User Preference + Popularity + Freshness + Location Relevance + Engagement
+```
+
+---
+
+## 🛣️ Roadmap
+
+- [x] **Phase 0** — Planning
+- [ ] **Phase 1** — Backend foundation *(in progress)*
+- [ ] **Phase 2** — Authentication & security
+- [ ] **Phase 3** — Restaurant & food management
+- [ ] **Phase 4** — Food reels
+- [ ] **Phase 5** — Personalized feed
+- [ ] **Phase 6** — Redis & performance
+- [ ] **Phase 7** — Search & location
+- [ ] **Phase 8** — Cart & orders
+- [ ] **Phase 9** — External ordering
+- [ ] **Phase 10** — Production engineering
+
+---
+
+## 📌 Current Status
+
+**🟡 Active Development — Phase 1: Backend Foundation**
+
+```text
+✅ Spring Boot application
+✅ PostgreSQL connection
+✅ JPA/Hibernate configuration
+✅ User entity, UserRole enum, UserRepository
+
+➡️ Next: UserService → UserController → User CRUD → DTOs → Validation
+```
+
+---
+
+## 💻 Local Setup
+
+**Requirements:** Java 25, PostgreSQL, Git, Postman
+
+```bash
+git clone https://github.com/CalWin10/FoodReels-Backend.git
+cd FoodReels-Backend
+git switch dev
+```
+
+**Database:** create a PostgreSQL database named `foodreels`, then set the connection properties in `src/main/resources/application.properties`.
+
+> Never commit passwords or secrets. Use environment variables (`DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `JWT_SECRET`) as the project matures.
+
+**Run the app** (`http://localhost:8080`):
+
+```bash
+./mvnw spring-boot:run        # Linux/macOS
+.\mvnw.cmd spring-boot:run    # Windows
+```
+
+**Build and test:**
+
+```bash
+./mvnw clean package
+./mvnw test
+```
+
+---
+
+## 🔀 Git Workflow
+
+```text
+main  ← stable milestones
+ └── dev  ← active development
+      └── feature/*  ← individual features
+```
+
+Commit style: `feat:`, `fix:`, `test:`, `refactor:`, `docs:`
+
+---
+
+## 🧱 Engineering Principles
+
+1. Build incrementally
+2. Avoid premature complexity
+3. Separate responsibilities
+4. Protect sensitive data
+5. Design before implementation
+6. Test continuously
+7. Keep Git history meaningful
+
+---
+
+## 🔮 Future Improvements
+
+AI-based recommendations · creator and restaurant analytics · real-time notifications · social following · geospatial search · event-driven architecture · horizontal scaling
+
+---
+
+## 📄 License
+
+Personal learning and portfolio project. See the repository license for terms.
+
+---
+
+## 👨‍💻 Developer
+
+**Calwin Samuel V** — Computer Science & Engineering Student
+
+GitHub: [CalWin10](https://github.com/CalWin10) · Repo: [FoodReels-Backend](https://github.com/CalWin10/FoodReels-Backend)
+
+---
+
+<p align="center">
+  Built with ☕ Java + Spring Boot + PostgreSQL
+</p>
+
+<p align="center">
+  <strong>Discover food. Watch. Decide. Order.</strong>
+</p>
